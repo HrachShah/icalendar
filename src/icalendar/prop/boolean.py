@@ -64,6 +64,7 @@ class vBoolean(int):
 
     @property
     def ical_value(self) -> bool:
+        """The boolean value of the vBoolean."""
         return bool(self)
 
     @classmethod
