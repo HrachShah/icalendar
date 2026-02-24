@@ -43,6 +43,7 @@ from icalendar.attr import (
     summary_property,
     uid_property,
     url_property,
+    recurrence_id_property,
 )
 from icalendar.cal.component import Component
 from icalendar.cal.examples import get_example
@@ -313,6 +314,7 @@ class Todo(Component):
     attendees = attendees_property
     images = images_property
     conferences = conferences_property
+    recurrence_id = recurrence_id_property
 
     @classmethod
     def new(
@@ -343,6 +345,7 @@ class Todo(Component):
         summary: str | None = None,
         uid: str | uuid.UUID | None = None,
         url: str | None = None,
+        recurrence_id: date | datetime | None = None,
     ):
         """Create a new TODO with all required properties.
 
@@ -412,6 +415,7 @@ class Todo(Component):
         todo.status = status
         todo.attendees = attendees
         todo.conferences = conferences
+        todo.recurrence_id = recurrence_id
 
         if cls._validate_new:
             cls._validate_start_and_end(start, end)

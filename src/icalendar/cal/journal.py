@@ -27,6 +27,7 @@ from icalendar.attr import (
     summary_property,
     uid_property,
     url_property,
+    recurrence_id_property, 
 )
 from icalendar.cal.component import Component
 from icalendar.error import IncompleteComponent
@@ -150,6 +151,7 @@ class Journal(Component):
     contacts = contacts_property
     status = status_property
     attendees = attendees_property
+    recurrence_id = recurrence_id_property 
 
     @property
     def description(self) -> str:
@@ -200,6 +202,7 @@ class Journal(Component):
         summary: str | None = None,
         uid: str | uuid.UUID | None = None,
         url: str | None = None,
+        recurrence_id: date | datetime | None = None,
     ):
         """Create a new journal entry with all required properties.
 
@@ -265,6 +268,7 @@ class Journal(Component):
         journal.start = start
         journal.status = status
         journal.attendees = attendees
+        journal.recurrence_id = recurrence_id
 
         return journal
 

@@ -37,7 +37,11 @@ Breaking changes
 New features
 ~~~~~~~~~~~~
 
-- ...
+- Added :attr:`Event.recurrence_id <icalendar.cal.event.Event.recurrence_id>`,
+  :attr:`Todo.recurrence_id <icalendar.cal.todo.Todo.recurrence_id>` and
+  :attr:`Journal.recurrence_id <icalendar.cal.journal.Journal.recurrence_id>`
+  properties, including support in :meth:`Component.new
+  <icalendar.cal.component.Component.new>`. :issue:`1231`
 
 Bug fixes
 ~~~~~~~~~

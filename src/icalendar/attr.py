@@ -1108,6 +1108,33 @@ Property Parameters:
 """,
 )
 
+recurrence_id_property = create_single_property(
+    "RECURRENCE-ID",
+    "dt",
+    (date, datetime),
+    date | datetime,
+    """
+RECURRENCE-ID identifies a specific instance of a recurring
+\"VEVENT\", \"VTODO\", or \"VJOURNAL\" component.
+
+Value type:
+    The default value type is DATE-TIME. The value type MAY be set
+    to DATE. The value type MUST match the value type of the
+    DTSTART property in the same component.
+
+Description:
+    This property is used together with UID and SEQUENCE to refer
+    to one particular occurrence in a recurrence set. The value is
+    the original start date or date-time of that instance, not the
+    rescheduled time.
+
+Conformance:
+    This property MAY occur in recurring VEVENT, VTODO, and
+    VJOURNAL components.
+
+""",
+    vDDDTypes,
+)
 
 def _get_organizer(self: Component) -> vCalAddress | None:
     """ORGANIZER defines the organizer for a calendar component.
@@ -2474,4 +2501,5 @@ __all__ = [
     "transparency_property",
     "uid_property",
     "url_property",
+    "recurrence_id_property",
 ]

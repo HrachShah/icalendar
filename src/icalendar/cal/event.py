@@ -44,6 +44,7 @@ from icalendar.attr import (
     transparency_property,
     uid_property,
     url_property,
+    recurrence_id_property,
 )
 from icalendar.cal.component import Component
 from icalendar.cal.examples import get_example
@@ -424,6 +425,7 @@ class Event(Component):
     attendees = attendees_property
     images = images_property
     conferences = conferences_property
+    recurrence_id = recurrence_id_property
 
     @classmethod
     def new(
@@ -455,6 +457,7 @@ class Event(Component):
         summary: str | None = None,
         uid: str | uuid.UUID | None = None,
         url: str | None = None,
+        recurrence_id: date | datetime | None = None,
     ):
         """Create a new event with all required properties.
 
@@ -526,6 +529,7 @@ class Event(Component):
         event.status = status
         event.attendees = attendees
         event.conferences = conferences
+        event.recurrence_id = recurrence_id
 
         if cls._validate_new:
             cls._validate_start_and_end(start, end)
