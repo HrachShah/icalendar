@@ -34,6 +34,7 @@ from icalendar.attr import (
     property_get_duration,
     property_set_duration,
     rdates_property,
+    recurrence_id_property,
     rrules_property,
     sequence_property,
     set_duration_with_locking,
@@ -43,7 +44,6 @@ from icalendar.attr import (
     summary_property,
     uid_property,
     url_property,
-    recurrence_id_property,
 )
 from icalendar.cal.component import Component
 from icalendar.cal.examples import get_example

@@ -4,7 +4,6 @@ import pytest
 
 from icalendar import Event, Journal, Todo
 
-
 RECURRENCE_COMPONENTS = (Event, Todo, Journal)
 
 

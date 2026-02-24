@@ -21,13 +21,13 @@ from icalendar.attr import (
     images_property,
     organizer_property,
     rdates_property,
+    recurrence_id_property,
     rrules_property,
     sequence_property,
     status_property,
     summary_property,
     uid_property,
     url_property,
-    recurrence_id_property, 
 )
 from icalendar.cal.component import Component
 from icalendar.error import IncompleteComponent
@@ -151,7 +151,7 @@ class Journal(Component):
     contacts = contacts_property
     status = status_property
     attendees = attendees_property
-    recurrence_id = recurrence_id_property 
+    recurrence_id = recurrence_id_property
 
     @property
     def description(self) -> str:

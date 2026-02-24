@@ -1136,6 +1136,7 @@ Conformance:
     vDDDTypes,
 )
 
+
 def _get_organizer(self: Component) -> vCalAddress | None:
     """ORGANIZER defines the organizer for a calendar component.
 
@@ -2482,6 +2483,7 @@ __all__ = [
     "property_get_duration",
     "property_set_duration",
     "rdates_property",
+    "recurrence_id_property",
     "refids_property",
     "related_to_property",
     "rfc_7953_dtend_property",
@@ -2501,5 +2503,4 @@ __all__ = [
     "transparency_property",
     "uid_property",
     "url_property",
-    "recurrence_id_property",
 ]
