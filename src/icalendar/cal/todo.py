@@ -9,6 +9,7 @@ from typing import TYPE_CHECKING, Literal
 from icalendar.attr import (
     CONCEPTS_TYPE_SETTER,
     LINKS_TYPE_SETTER,
+    RECURRENCE_ID,
     RELATED_TO_TYPE_SETTER,
     X_MOZ_LASTACK_property,
     X_MOZ_SNOOZE_TIME_property,
@@ -34,7 +35,6 @@ from icalendar.attr import (
     property_get_duration,
     property_set_duration,
     rdates_property,
-    recurrence_id_property,
     rrules_property,
     sequence_property,
     set_duration_with_locking,
@@ -314,7 +314,7 @@ class Todo(Component):
     attendees = attendees_property
     images = images_property
     conferences = conferences_property
-    recurrence_id = recurrence_id_property
+    recurrence_id = RECURRENCE_ID
 
     @classmethod
     def new(

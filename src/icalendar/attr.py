@@ -1108,14 +1108,14 @@ Property Parameters:
 """,
 )
 
-recurrence_id_property = create_single_property(
+RECURRENCE_ID = create_single_property(
     "RECURRENCE-ID",
     "dt",
     (date, datetime),
     date | datetime,
-    """
+    r"""
 RECURRENCE-ID identifies a specific instance of a recurring
-\"VEVENT\", \"VTODO\", or \"VJOURNAL\" component.
+"VEVENT", "VTODO", or "VJOURNAL" component.
 
 Value type:
     The default value type is DATE-TIME. The value type MAY be set
@@ -1131,7 +1131,6 @@ Description:
 Conformance:
     This property MAY occur in recurring VEVENT, VTODO, and
     VJOURNAL components.
-
 """,
     vDDDTypes,
 )
@@ -2452,6 +2451,7 @@ Examples:
 __all__ = [
     "CONCEPTS_TYPE_SETTER",
     "LINKS_TYPE_SETTER",
+    "RECURRENCE_ID",
     "RELATED_TO_TYPE_SETTER",
     "attendees_property",
     "busy_type_property",
@@ -2483,7 +2483,6 @@ __all__ = [
     "property_get_duration",
     "property_set_duration",
     "rdates_property",
-    "recurrence_id_property",
     "refids_property",
     "related_to_property",
     "rfc_7953_dtend_property",
