@@ -2,91 +2,112 @@ from datetime import date, datetime, timezone
 
 import pytest
 
-from icalendar import Event, Journal, Todo
+from icalendar import Available, Calendar, Event, Journal, Todo
+from icalendar.attr import RECURRENCE_ID
 from icalendar.error import InvalidCalendar
 from icalendar.prop import vText
 
-RECURRENCE_COMPONENTS = (Event, Todo, Journal)
+
+@pytest.fixture(params=[Event, Todo, Journal, Available])
+def component_cls(request):
+    return request.param
 
 
-@pytest.fixture(params=RECURRENCE_COMPONENTS)
-def component(request):
-    """Return an instance of a component that can have a RECURRENCE-ID."""
-    return request.param()
+@pytest.fixture
+def component(component_cls):
+    return component_cls({})
 
 
 def test_recurrence_id_absent_returns_none(component):
-    """RECURRENCE-ID returns None if the property is absent."""
-    assert component.recurrence_id is None
+    """If RECURRENCE-ID is absent, RECURRENCE_ID getter returns None."""
+    assert "RECURRENCE-ID" not in component
+
+    assert RECURRENCE_ID.__get__(component, type(component)) is None
 
 
-def test_recurrence_id_returns_datetime(component):
-    """RECURRENCE-ID returns the datetime if it is present."""
-    dt = datetime(2025, 4, 28, 16, 5)
-    component.recurrence_id = dt
-    assert component.recurrence_id == dt
-    assert component["RECURRENCE-ID"].dt == dt
+@pytest.mark.parametrize(
+    "value",
+    [
+        datetime(2025, 4, 28, 16, 5, tzinfo=timezone.utc),
+        datetime(2025, 4, 28, 16, 5),
+    ],
+)
+def test_recurrence_id_returns_datetime(component, value):
+    """RECURRENCE-ID set to datetime is returned as datetime."""
+    RECURRENCE_ID.__set__(component, value)
+    assert "RECURRENCE-ID" in component
+
+    result = RECURRENCE_ID.__get__(component, type(component))
+    assert isinstance(result, datetime)
+    assert result == value
 
 
 def test_recurrence_id_returns_date(component):
-    """RECURRENCE-ID returns the date if it is present."""
-    d = date(2025, 4, 28)
-    component.recurrence_id = d
-    assert component.recurrence_id == d
-    assert component["RECURRENCE-ID"].dt == d
+    """RECURRENCE-ID set to date is returned as date."""
+    value = date(2025, 4, 28)
+    RECURRENCE_ID.__set__(component, value)
+    assert "RECURRENCE-ID" in component
+
+    result = RECURRENCE_ID.__get__(component, type(component))
+    assert isinstance(result, date)
+    assert not isinstance(result, datetime)
+    assert result == value
 
 
-def test_recurrence_id_invalid_type_raises(component):
-    """RECURRENCE-ID raises TypeError if the value is not a date or datetime."""
+@pytest.mark.parametrize("invalid", [42, object(), "not-a-date"])
+def test_recurrence_id_invalid_type_raises(component, invalid):
+    """Setting RECURRENCE-ID to an invalid Python type raises TypeError."""
     with pytest.raises(TypeError):
-        component.recurrence_id = "not-a-date"
+        RECURRENCE_ID.__set__(component, invalid)
 
 
-def test_recurrence_id_invalid_raw_value_raises_invalid_calendar(component):
-    """Invalid raw value in RECURRENCE-ID raises InvalidCalendar."""
-    component["RECURRENCE-ID"] = "not-a-date"
-
-    with pytest.raises(InvalidCalendar):
-        _ = component.recurrence_id
-
-
-def test_recurrence_id_invalid_vprop_raises_invalid_calendar(component):
-    """Invalid vProp in RECURRENCE-ID raises InvalidCalendar."""
-    component["RECURRENCE-ID"] = vText("some text")
+@pytest.mark.parametrize("raw", [vText("some text"), vText(b"some text")])
+def test_recurrence_id_invalid_raw_value_raises_invalid_calendar(component_cls, raw):
+    """Invalid raw vProp in RECURRENCE-ID raises InvalidCalendar on access."""
+    component = component_cls({"RECURRENCE-ID": raw})
 
     with pytest.raises(InvalidCalendar):
-        _ = component.recurrence_id
+        _ = RECURRENCE_ID.__get__(component, component_cls)
+
+
+def test_recurrence_id_invalid_vprop_raises_invalid_calendar(component_cls):
+    """Invalid vProp object in RECURRENCE-ID raises InvalidCalendar."""
+    component = component_cls({"RECURRENCE-ID": vText("some text")})
+
+    with pytest.raises(InvalidCalendar):
+        _ = RECURRENCE_ID.__get__(component, component_cls)
 
 
 def test_recurrence_id_set_none_deletes_property(component):
     """Setting RECURRENCE-ID to None removes the property."""
     dt = datetime(2025, 4, 28, 16, 5)
-    component.recurrence_id = dt
+    RECURRENCE_ID.__set__(component, dt)
+
     assert "RECURRENCE-ID" in component
 
-    component.recurrence_id = None
-
-    assert component.recurrence_id is None
+    RECURRENCE_ID.__set__(component, None)
     assert "RECURRENCE-ID" not in component
 
 
 def test_recurrence_id_del_deletes_property(component):
     """Deleting RECURRENCE-ID removes the property."""
     dt = datetime(2025, 4, 28, 16, 5)
-    component.recurrence_id = dt
+    RECURRENCE_ID.__set__(component, dt)
+
     assert "RECURRENCE-ID" in component
 
     del component["RECURRENCE-ID"]
-
-    assert component.recurrence_id is None
     assert "RECURRENCE-ID" not in component
 
+    assert RECURRENCE_ID.__get__(component, type(component)) is None
 
-def test_recurrence_id_with_timezone_in_to_ical(component):
+
+def test_recurrence_id_with_timezone_in_to_ical(component_cls):
     """RECURRENCE-ID with timezone is preserved in to_ical()."""
+    component = component_cls({})
     dt = datetime(2025, 4, 28, 16, 5, tzinfo=timezone.utc)
-    component.recurrence_id = dt
 
+    RECURRENCE_ID.__set__(component, dt)
     ical_bytes = component.to_ical()
     lines = ical_bytes.splitlines()
 
@@ -96,10 +117,10 @@ def test_recurrence_id_with_timezone_in_to_ical(component):
     )
 
 
-def test_recurrence_id_parsed_from_calendar(calendars):
+@pytest.mark.parametrize("tz_backend", ["pytz", "zoneinfo"])
+def test_recurrence_id_parsed_from_calendar(tz_backend, calendars):
     """RECURRENCE-ID is correctly parsed from existing calendars."""
-    cal = calendars["issue_1231_recurrence"]
-
+    cal: Calendar = calendars["issue_1231_recurrence"]
     components = [
         c
         for c in cal.walk()
@@ -109,8 +130,8 @@ def test_recurrence_id_parsed_from_calendar(calendars):
     assert components, "Expected at least one component with RECURRENCE-ID"
 
     comp = components[0]
-
     expected = datetime(2025, 4, 28, 16, 5, tzinfo=timezone.utc)
 
-    assert comp.recurrence_id == expected
-    assert comp["RECURRENCE-ID"].dt == expected
+    result = RECURRENCE_ID.__get__(comp, type(comp))
+    assert isinstance(result, datetime)
+    assert result == expected

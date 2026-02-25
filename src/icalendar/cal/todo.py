@@ -378,6 +378,7 @@ class Todo(Component):
             uid: The :attr:`uid` of the todo.
                 If None, this is set to a new :func:`uuid.uuid4`.
             url: The :attr:`url` of the todo.
+            recurrence_id: The :attr:`RECURRENCE_ID` of the event.
 
         Returns:
             :class:`Todo`
