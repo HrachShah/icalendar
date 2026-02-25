@@ -101,9 +101,11 @@ def test_recurrence_id_parsed_from_calendar(calendars):
     cal = calendars["issue_1231_recurrence"]
 
     components = [
-        c for c in cal.walk()
+        c
+        for c in cal.walk()
         if c.name in {"VEVENT", "VTODO", "VJOURNAL"} and "RECURRENCE-ID" in c
     ]
+
     assert components, "Expected at least one component with RECURRENCE-ID"
 
     comp = components[0]
