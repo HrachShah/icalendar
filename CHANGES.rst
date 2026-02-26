@@ -46,7 +46,12 @@ New features
 Bug fixes
 ~~~~~~~~~
 
-- ...
+- Fixed :meth:`Calendar.get_missing_tzids <icalendar.cal.calendar.Calendar.get_missing_tzids>`
+  raising ``KeyError`` when a VTIMEZONE exists for a timezone not referenced by any event TZID
+  (e.g. added by x-wr-timezone conversion). :issue:`1124`
+- Fixed :meth:`Parameters.update_tzid_from <icalendar.parser.parameter.Parameters.update_tzid_from>`
+  incorrectly setting ``TZID=UTC`` on UTC datetimes. :rfc:`5545` section 3.2.19 requires UTC datetimes to
+  use the ``Z`` suffix without a ``TZID`` parameter. :issue:`1124`
 
 Documentation
 ~~~~~~~~~~~~~

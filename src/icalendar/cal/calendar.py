@@ -252,7 +252,9 @@ class Calendar(Component):
         """
         tzids = self.get_used_tzids()
         for timezone in self.timezones:
-            tzids.remove(timezone.tz_name)
+            # discard (not remove) — a VTIMEZONE may exist for a timezone not
+            # referenced by any event TZID (e.g. added by x-wr-timezone conversion)
+            tzids.discard(timezone.tz_name)
         return tzids
 
     @property
