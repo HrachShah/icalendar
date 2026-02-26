@@ -193,6 +193,7 @@ class Journal(Component):
         last_modified: date | None = None,
         links: LINKS_TYPE_SETTER = None,
         organizer: vCalAddress | str | None = None,
+        recurrence_id: date | datetime | None = None,
         refids: list[str] | str | None = None,
         related_to: RELATED_TO_TYPE_SETTER = None,
         sequence: int | None = None,
@@ -202,7 +203,6 @@ class Journal(Component):
         summary: str | None = None,
         uid: str | uuid.UUID | None = None,
         url: str | None = None,
-        recurrence_id: date | datetime | None = None,
     ):
         """Create a new journal entry with all required properties.
 
@@ -223,6 +223,7 @@ class Journal(Component):
                 the journal.
             links: The :attr:`~icalendar.Component.links` of the journal.
             organizer: The :attr:`organizer` of the journal.
+            recurrence_id: The :attr:`RECURRENCE_ID` of the event.
             refids: :attr:`~icalendar.Component.refids` of the journal.
             related_to: :attr:`~icalendar.Component.related_to` of the journal.
             sequence: The :attr:`sequence` of the journal.
@@ -234,7 +235,6 @@ class Journal(Component):
             uid: The :attr:`uid` of the journal.
                 If None, this is set to a new :func:`uuid.uuid4`.
             url: The :attr:`url` of the journal.
-            recurrence_id: The :attr:`RECURRENCE_ID` of the event.
 
         Returns:
             :class:`Journal`

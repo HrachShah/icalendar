@@ -12,6 +12,7 @@ from typing import TYPE_CHECKING
 from icalendar.attr import (
     CONCEPTS_TYPE_SETTER,
     LINKS_TYPE_SETTER,
+    RECURRENCE_ID,
     RELATED_TO_TYPE_SETTER,
     busy_type_property,
     categories_property,
@@ -217,6 +218,7 @@ class Availability(Component):
     categories = categories_property
     priority = priority_property
     contacts = contacts_property
+    recurrence_id = RECURRENCE_ID
 
     start = DTSTART = rfc_7953_dtstart_property
     DTEND = rfc_7953_dtend_property
@@ -253,6 +255,7 @@ class Availability(Component):
         location: str | None = None,
         organizer: vCalAddress | str | None = None,
         priority: int | None = None,
+        recurrence_id: date | datetime | None = None,
         refids: list[str] | str | None = None,
         related_to: RELATED_TO_TYPE_SETTER = None,
         sequence: int | None = None,
@@ -281,6 +284,7 @@ class Availability(Component):
             links: The :attr:`links` of the availability.
             location: The :attr:`location` of the availability.
             organizer: The :attr:`organizer` of the availability.
+            recurrence_id: The :attr:`RECURRENCE_ID` of the event.
             refids: :attr:`refids` of the availability.
             related_to: :attr:`related_to` of the availability.
             sequence: The :attr:`sequence` of the availability.
@@ -323,6 +327,7 @@ class Availability(Component):
         availability.location = location
         availability.priority = priority
         availability.contacts = contacts
+        availability.recurrence_id = recurrence_id
         for subcomponent in components:
             availability.add_component(subcomponent)
         if cls._validate_new:

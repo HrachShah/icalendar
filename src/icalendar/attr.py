@@ -1113,24 +1113,19 @@ RECURRENCE_ID = create_single_property(
     "dt",
     (date, datetime),
     date | datetime,
-    r"""
-RECURRENCE-ID identifies a specific instance of a recurring
-"VEVENT", "VTODO", or "VJOURNAL" component.
+    """
+Identify a specific occurrence of a recurring calendar object.
 
-Value type:
-    The default value type is DATE-TIME. The value type MAY be set
-    to DATE. The value type MUST match the value type of the
-    DTSTART property in the same component.
+This property is used together with ``UID`` and ``SEQUENCE`` to refer to one
+particular instance in a recurrence set. The value is the original start
+date or date‑time of that instance, not the rescheduled time.
 
-Description:
-    This property is used together with UID and SEQUENCE to refer
-    to one particular occurrence in a recurrence set. The value is
-    the original start date or date-time of that instance, not the
-    rescheduled time.
+The value is usually a DATE‑TIME and must use the same value type as the
+``DTSTART`` property in the same component. A DATE value may be used for
+all‑day items instead.
 
-Conformance:
-    This property MAY occur in recurring VEVENT, VTODO, and
-    VJOURNAL components.
+This property corresponds to ``RECURRENCE-ID`` as defined in RFC 5545 and
+may appear in recurring ``VEVENT``, ``VTODO``, and ``VJOURNAL`` components.
 """,
     vDDDTypes,
 )

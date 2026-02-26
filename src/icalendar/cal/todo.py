@@ -336,6 +336,7 @@ class Todo(Component):
         location: str | None = None,
         organizer: vCalAddress | str | None = None,
         priority: int | None = None,
+        recurrence_id: date | datetime | None = None,
         refids: list[str] | str | None = None,
         related_to: RELATED_TO_TYPE_SETTER = None,
         sequence: int | None = None,
@@ -345,7 +346,6 @@ class Todo(Component):
         summary: str | None = None,
         uid: str | uuid.UUID | None = None,
         url: str | None = None,
-        recurrence_id: date | datetime | None = None,
     ):
         """Create a new TODO with all required properties.
 
@@ -367,6 +367,7 @@ class Todo(Component):
             links: The :attr:`~icalendar.Component.links` of the todo.
             location: The :attr:`location` of the todo.
             organizer: The :attr:`organizer` of the todo.
+            recurrence_id: The :attr:`RECURRENCE_ID` of the event.
             refids: :attr:`~icalendar.Component.refids` of the todo.
             related_to: :attr:`~icalendar.Component.related_to` of the todo.
             sequence: The :attr:`sequence` of the todo.
@@ -378,7 +379,6 @@ class Todo(Component):
             uid: The :attr:`uid` of the todo.
                 If None, this is set to a new :func:`uuid.uuid4`.
             url: The :attr:`url` of the todo.
-            recurrence_id: The :attr:`RECURRENCE_ID` of the event.
 
         Returns:
             :class:`Todo`

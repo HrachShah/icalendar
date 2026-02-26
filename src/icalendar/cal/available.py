@@ -110,6 +110,7 @@ class Available(Component):
         last_modified: date | None = None,
         links: LINKS_TYPE_SETTER = None,
         location: str | None = None,
+        recurrence_id: date | datetime | None = None,
         refids: list[str] | str | None = None,
         related_to: RELATED_TO_TYPE_SETTER = None,
         sequence: int | None = None,
@@ -117,7 +118,6 @@ class Available(Component):
         start: datetime | None = None,
         summary: str | None = None,
         uid: str | uuid.UUID | None = None,
-        recurrence_id: date | datetime | None = None,
     ):
         """Create a new Available component with all required properties.
 
@@ -138,6 +138,7 @@ class Available(Component):
                 Available component.
             links: The :attr:`~icalendar.Component.links` of the Available component.
             location: The :attr:`location` of the Available component.
+            recurrence_id: The :attr:`RECURRENCE_ID` of the event.
             refids: :attr:`~icalendar.Component.refids` of the Available component.
             related_to: :attr:`~icalendar.Component.related_to` of the Available
                 component.
@@ -148,7 +149,6 @@ class Available(Component):
             summary: The :attr:`summary` of the Available component.
             uid: The :attr:`uid` of the Available component.
                 If None, this is set to a new :func:`uuid.uuid4`.
-            recurrence_id: The :attr:`RECURRENCE_ID` of the event.
 
         Returns:
             :class:`Available`
