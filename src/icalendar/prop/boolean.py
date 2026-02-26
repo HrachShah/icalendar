@@ -106,6 +106,4 @@ class vBoolean(int):
         )
 
 
-
-
 __all__ = ["vBoolean"]
