@@ -32,6 +32,7 @@ if TYPE_CHECKING:
     from icalendar.cal.availability import Availability
     from icalendar.cal.event import Event
     from icalendar.cal.free_busy import FreeBusy
+    from icalendar.cal.journal import Journal
     from icalendar.cal.todo import Todo
 
 
@@ -172,7 +173,7 @@ class Calendar(Component):
 
         This is a shortcut to get all events.
         Modifications do not change the calendar.
-        Use :py:meth:`Component.add_component`.
+        Use :py:meth:`Component.add_component <icalendar.cal.component.Component.add_component>`.
 
         >>> from icalendar import Calendar
         >>> calendar = Calendar.example()
@@ -190,9 +191,19 @@ class Calendar(Component):
 
         This is a shortcut to get all todos.
         Modifications do not change the calendar.
-        Use :py:meth:`Component.add_component`.
+        Use :py:meth:`Component.add_component <icalendar.cal.component.Component.add_component>`.
         """
         return self.walk("VTODO")
+
+    @property
+    def journals(self) -> list[Journal]:
+        """All journal components in the calendar.
+
+        This is a shortcut to get all journals.
+        Modifications do not change the calendar.
+        Use :py:meth:`Component.add_component <icalendar.cal.component.Component.add_component>`.
+        """
+        return self.walk("VJOURNAL")
 
     @property
     def availabilities(self) -> list[Availability]:
@@ -200,7 +211,7 @@ class Calendar(Component):
 
         This is a shortcut to get all availabilities.
         Modifications do not change the calendar.
-        Use :py:meth:`Component.add_component`.
+        Use :py:meth:`Component.add_component <icalendar.cal.component.Component.add_component>`.
         """
         return self.walk("VAVAILABILITY")
 
@@ -210,7 +221,7 @@ class Calendar(Component):
 
         This is a shortcut to get all FreeBusy.
         Modifications do not change the calendar.
-        Use :py:meth:`Component.add_component`.
+        Use :py:meth:`Component.add_component <icalendar.cal.component.Component.add_component>`.
         """
         return self.walk("VFREEBUSY")
 
