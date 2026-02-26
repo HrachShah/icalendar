@@ -12,7 +12,6 @@ from typing import TYPE_CHECKING
 from icalendar.attr import (
     CONCEPTS_TYPE_SETTER,
     LINKS_TYPE_SETTER,
-    RECURRENCE_ID,
     RELATED_TO_TYPE_SETTER,
     categories_property,
     contacts_property,
@@ -88,7 +87,7 @@ class Available(Component):
     exdates = exdates_property
     rdates = rdates_property
     rrules = rrules_property
-    recurrence_id = RECURRENCE_ID
+    from icalendar.attr import RECURRENCE_ID
 
     start = DTSTART = rfc_7953_dtstart_property
     DTEND = rfc_7953_dtend_property
@@ -138,7 +137,7 @@ class Available(Component):
                 Available component.
             links: The :attr:`~icalendar.Component.links` of the Available component.
             location: The :attr:`location` of the Available component.
-            recurrence_id: The :attr:`RECURRENCE_ID` of the event.
+            recurrence_id: The :attr:`RECURRENCE_ID` of the Available component.
             refids: :attr:`~icalendar.Component.refids` of the Available component.
             related_to: :attr:`~icalendar.Component.related_to` of the Available
                 component.
@@ -176,7 +175,7 @@ class Available(Component):
         available.categories = categories
         available.location = location
         available.contacts = contacts
-        available.recurrence_id = recurrence_id
+        available.RECURRENCE_ID = recurrence_id
 
         if cls._validate_new:
             if end is not None and (

@@ -413,8 +413,8 @@ new_test_cases = [
         "set the end",
     ),
     (
-        {Event, Todo, Journal, Available, Availability},
-        "recurrence_id",
+        {Event, Todo, Journal, Available},
+        "RECURRENCE_ID",
         "RECURRENCE-ID",
         datetime(2025, 4, 28, 16, 5, tzinfo=ZoneInfo("UTC")),
         datetime(2025, 4, 28, 16, 5, tzinfo=ZoneInfo("UTC")),
@@ -422,8 +422,8 @@ new_test_cases = [
         "set the recurrence_id",
     ),
     (
-        {Event, Todo, Journal, Available, Availability},
-        "recurrence_id",
+        {Event, Todo, Journal, Available},
+        "RECURRENCE_ID",
         "RECURRENCE-ID",
         None,
         None,

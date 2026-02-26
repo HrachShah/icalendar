@@ -9,7 +9,6 @@ from typing import TYPE_CHECKING, Literal
 from icalendar.attr import (
     CONCEPTS_TYPE_SETTER,
     LINKS_TYPE_SETTER,
-    RECURRENCE_ID,
     RELATED_TO_TYPE_SETTER,
     X_MOZ_LASTACK_property,
     X_MOZ_SNOOZE_TIME_property,
@@ -314,7 +313,7 @@ class Todo(Component):
     attendees = attendees_property
     images = images_property
     conferences = conferences_property
-    recurrence_id = RECURRENCE_ID
+    from icalendar.attr import RECURRENCE_ID
 
     @classmethod
     def new(
@@ -367,7 +366,7 @@ class Todo(Component):
             links: The :attr:`~icalendar.Component.links` of the todo.
             location: The :attr:`location` of the todo.
             organizer: The :attr:`organizer` of the todo.
-            recurrence_id: The :attr:`RECURRENCE_ID` of the event.
+            recurrence_id: The :attr:`RECURRENCE_ID` of the todo.
             refids: :attr:`~icalendar.Component.refids` of the todo.
             related_to: :attr:`~icalendar.Component.related_to` of the todo.
             sequence: The :attr:`sequence` of the todo.
@@ -416,7 +415,7 @@ class Todo(Component):
         todo.status = status
         todo.attendees = attendees
         todo.conferences = conferences
-        todo.recurrence_id = recurrence_id
+        todo.RECURRENCE_ID = recurrence_id
 
         if cls._validate_new:
             cls._validate_start_and_end(start, end)

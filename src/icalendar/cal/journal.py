@@ -9,7 +9,6 @@ from typing import TYPE_CHECKING
 from icalendar.attr import (
     CONCEPTS_TYPE_SETTER,
     LINKS_TYPE_SETTER,
-    RECURRENCE_ID,
     RELATED_TO_TYPE_SETTER,
     attendees_property,
     categories_property,
@@ -151,7 +150,7 @@ class Journal(Component):
     contacts = contacts_property
     status = status_property
     attendees = attendees_property
-    recurrence_id = RECURRENCE_ID
+    from icalendar.attr import RECURRENCE_ID
 
     @property
     def description(self) -> str:
@@ -223,7 +222,7 @@ class Journal(Component):
                 the journal.
             links: The :attr:`~icalendar.Component.links` of the journal.
             organizer: The :attr:`organizer` of the journal.
-            recurrence_id: The :attr:`RECURRENCE_ID` of the event.
+            recurrence_id: The :attr:`RECURRENCE_ID` of the journal.
             refids: :attr:`~icalendar.Component.refids` of the journal.
             related_to: :attr:`~icalendar.Component.related_to` of the journal.
             sequence: The :attr:`sequence` of the journal.
@@ -269,7 +268,7 @@ class Journal(Component):
         journal.start = start
         journal.status = status
         journal.attendees = attendees
-        journal.recurrence_id = recurrence_id
+        journal.RECURRENCE_ID = recurrence_id
 
         return journal
 

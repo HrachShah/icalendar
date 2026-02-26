@@ -9,7 +9,6 @@ from typing import TYPE_CHECKING, Literal
 from icalendar.attr import (
     CONCEPTS_TYPE_SETTER,
     LINKS_TYPE_SETTER,
-    RECURRENCE_ID,
     RELATED_TO_TYPE_SETTER,
     X_MOZ_LASTACK_property,
     X_MOZ_SNOOZE_TIME_property,
@@ -425,7 +424,7 @@ class Event(Component):
     attendees = attendees_property
     images = images_property
     conferences = conferences_property
-    recurrence_id = RECURRENCE_ID
+    from icalendar.attr import RECURRENCE_ID
 
     @classmethod
     def new(
@@ -530,7 +529,7 @@ class Event(Component):
         event.status = status
         event.attendees = attendees
         event.conferences = conferences
-        event.recurrence_id = recurrence_id
+        event.RECURRENCE_ID = recurrence_id
 
         if cls._validate_new:
             cls._validate_start_and_end(start, end)
