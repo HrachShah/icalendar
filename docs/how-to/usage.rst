@@ -233,22 +233,35 @@ Examples
 This section describes how to use icalendar's essential features.
 
 
-Inspect files
-'''''''''''''
+Read calendar from file
+'''''''''''''''''''''''
 
-Open an :file:`.ics` file and view its events.
+Read a calendar from a local :file:`.ics` file and view its events.
 
 .. code:: pycon
 
     >>> import icalendar
     >>> from pathlib import Path
     >>> ics_path = Path("src/icalendar/tests/calendars/example.ics")
-    >>> calendar = icalendar.Calendar.from_ical(ics_path.read_bytes())
+    >>> calendar = icalendar.Calendar.from_ical(ics_path)
     >>> for event in calendar.events:
     ...     print(event.get("SUMMARY"))
     New Year's Day
     Orthodox Christmas
     International Women's Day
+
+
+Read calendar from URL
+''''''''''''''''''''''
+
+To read a calendar from a URL, retrieve the data first, then parse it in icalendar.
+
+.. code-block:: python
+
+    from urllib.request import urlopen
+    url = "https://www.gov.uk/bank-holidays/england-and-wales.ics"
+    ics_data = urlopen(url).read()
+    calendar = icalendar.Calendar.from_ical(ics_data)
 
 
 Modify content
@@ -391,7 +404,7 @@ To continue to receive ``pytz`` timezones in parsed results, you can receive all
 Complete recurring meeting
 ''''''''''''''''''''''''''
 
-This section shows how create a complete and typical iCalendar file of a recurring meeting event, then add some properties to it, including a location, organizer, attendees, alarms, recurrence, and other properties.
+This section shows how to create a complete and typical iCalendar file of a recurring meeting event, then add some properties to it, including a location, organizer, attendees, alarms, recurrence, and other properties.
 This file can be loaded into any application that supports iCalendar files.
 
 Initialize the calendar.

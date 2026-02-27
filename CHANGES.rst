@@ -21,13 +21,14 @@ Upgrading from 6.x to 7.x should have **no complications for most developers**, 
 
 We still recommend checking out the new features and giving feedback in the repository.
 
-7.0.1 (unreleased)
+7.0.3 (unreleased)
 ------------------
 
 Minor changes
 ~~~~~~~~~~~~~
 
-- ...
+- Show colorful required code changes in the CI output to help contributors solve the formatting issues. :pr:`1216`
+- Use ruff 0.15.0 for code formatting in :file:`tox.ini`. :pr:`1215`
 
 Breaking changes
 ~~~~~~~~~~~~~~~~
@@ -49,6 +50,47 @@ Documentation
 
 - ...
 
+7.0.2 (2026-02-24)
+------------------
+
+Minor changes
+~~~~~~~~~~~~~
+
+- Show required code changes in the CI output to help contributors solve the formatting issues. :pr:`1216`
+- Use ruff 0.15.0 for code formatting in :file:`tox.ini`. :pr:`1215`
+
+New features
+~~~~~~~~~~~~
+
+- Enabled :meth:`Calendar.from_ical <icalendar.cal.calendar.Calendar.from_ical>` to read calendars from files. :issue:`756`
+- Added :attr:`Calendar.journals <icalendar.cal.calendar.Calendar.journals>` property to retrieve all journal components. :issue:`1230`
+
+Documentation
+~~~~~~~~~~~~~
+
+- Removed methods of ``str``, ``int``, and other classes and methods in the Python standard library from the documentation.
+
+7.0.1 (2026-02-17)
+------------------
+
+Minor changes
+~~~~~~~~~~~~~
+
+- Setting :attr:`~cal.calendar.Calendar.calendar_name` now also writes ``X-WR-CALNAME``, and setting :attr:`~cal.calendar.Calendar.description` now also writes ``X-WR-CALDESC``, for improved client compatibility. :issue:`918`
+
+Bug fixes
+~~~~~~~~~
+
+- Make ``typing_extensions`` a dependency. :issue:`1202`
+
+Documentation
+~~~~~~~~~~~~~
+
+- Fixed the version switcher on Read the Docs, and documented the process for a major release. :issue:`1194`
+- Added usage examples for reading calendars from files and URL. :issue:`756`
+- Add type hints and convert docstrings to Google Style in :file:`cli.py`. :issue:`938`
+
+
 7.0.0 (2026-02-11)
 ------------------
 
@@ -69,10 +111,12 @@ Minor changes
 - Add type hints to remaining prop value classes (vText, vCalAddress, vCategory, vGeo, vN, vOrg, vAdr, vBroken, vUid, Conference, Image). :issue:`938`
 - Added type hints and overloads to :meth:`Calendar.from_ical <icalendar.cal.calendar.Calendar.from_ical>` and :meth:`Component.from_ical <icalendar.cal.component.Component.from_ical>` to support ``multiple=True/False`` return types. :issue:`1129`
 - CI: Print a link to Vale documentation when the spell checker fails.
-- Remove ``bootstrap.py`` and ``buildout.cfg`` files as they are old build configurations. :pull:`1171`
+- Remove :file:`bootstrap.py` and :file:`buildout.cfg` files as they are old build configurations. :pr:`1171`
+- Enforce ruff formatting and linting across the entire codebase, with CI check to prevent regressions.
+  See :issue:`672`, :pr:`1171`, :pr:`1172`, :pr:`1173`, :pr:`1174`, :pr:`1175`, :pr:`1176`, :pr:`1177`, :pr:`1178`, :pr:`1179`, :pr:`1180`, and :pr:`1181`.
 - Fix type annotations, typos, and validation logic in prop module: corrected return type hints in ``parse_jcal_value`` methods, fixed ``to_ical()`` return type in vDDDTypes, updated ClassVar type hint in TypesFactory, removed dead code, fixed "abbrevation" typo in vWeekday, and corrected validation logic in vMonth. :issue:`1185`
-
 - Rename :class:`~icalendar.prop.vBrokenProperty` to :class:`~icalendar.prop.vBroken` to match naming convention. :class:`~icalendar.prop.vBroken` now stores the actual exception object in ``parse_error`` instead of a string, and raises :class:`~icalendar.error.BrokenCalendarProperty` when accessing attributes like ``.dt`` that the expected type would have. See :issue:`1087`.
+
 
 Breaking changes
 ~~~~~~~~~~~~~~~~
@@ -122,6 +166,7 @@ Documentation
 - Document how to create and read attendee information in events. See :issue:`130`.
 - Add usage examples. :issue:`443`
 - Improve documentation contribution guide by adding chapters for small edits, builds and checks, and a style guide. Added details for Vale usage, Diátaxis framework, narrative and API documentation, and fixing all spelling errors. See :issue:`991`.
+- Document dictionary and property accessors. :issue:`124`.
 - Moved content from the README into documentation to reduce maintenance and point to the authoritative source of information.
   See :issue:`1006`.
 - Added "Code conventions" section to the Development contributing guide.

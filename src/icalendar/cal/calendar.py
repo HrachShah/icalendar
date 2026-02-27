@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import uuid
 from datetime import timedelta
+from pathlib import Path
 from typing import TYPE_CHECKING, Literal, overload
 
 from icalendar.attr import (
@@ -31,6 +32,7 @@ if TYPE_CHECKING:
     from icalendar.cal.availability import Availability
     from icalendar.cal.event import Event
     from icalendar.cal.free_busy import FreeBusy
+    from icalendar.cal.journal import Journal
     from icalendar.cal.todo import Todo
 
 
@@ -87,17 +89,19 @@ class Calendar(Component):
     @overload
     @classmethod
     def from_ical(
-        cls, st: bytes | str, multiple: Literal[False] = False
+        cls, st: bytes | str | Path, multiple: Literal[False] = False
     ) -> Calendar: ...
 
     @overload
     @classmethod
-    def from_ical(cls, st: bytes | str, multiple: Literal[True]) -> list[Calendar]: ...
+    def from_ical(
+        cls, st: bytes | str | Path, multiple: Literal[True]
+    ) -> list[Calendar]: ...
 
     @classmethod
     def from_ical(
         cls,
-        st: bytes | str,
+        st: bytes | str | Path,
         multiple: bool = False,
     ) -> Calendar | list[Calendar]:
         """Parse iCalendar data into Calendar instances.
@@ -107,12 +111,24 @@ class Calendar(Component):
         forward-reference resolution and VTIMEZONE caching.
 
         Parameters:
-            st: iCalendar data as bytes or string
+            st: iCalendar data as bytes or string, or a path to an iCalendar file as
+                :class:`pathlib.Path` or string.
             multiple: If ``True``, returns list. If ``False``, returns single calendar.
 
         Returns:
             Calendar or list of Calendars
         """
+        if isinstance(st, Path):
+            st = st.read_bytes()
+        elif isinstance(st, str) and "\n" not in st and "\r" not in st:
+            path = Path(st)
+            try:
+                is_file = path.is_file()
+            except OSError:
+                is_file = False
+            if is_file:
+                st = path.read_bytes()
+
         comps = Component.from_ical(st, multiple=True)
         all_timezones_so_far = True
         for comp in comps:
@@ -157,7 +173,7 @@ class Calendar(Component):
 
         This is a shortcut to get all events.
         Modifications do not change the calendar.
-        Use :py:meth:`Component.add_component`.
+        Use :py:meth:`Component.add_component <icalendar.cal.component.Component.add_component>`.
 
         >>> from icalendar import Calendar
         >>> calendar = Calendar.example()
@@ -175,9 +191,19 @@ class Calendar(Component):
 
         This is a shortcut to get all todos.
         Modifications do not change the calendar.
-        Use :py:meth:`Component.add_component`.
+        Use :py:meth:`Component.add_component <icalendar.cal.component.Component.add_component>`.
         """
         return self.walk("VTODO")
+
+    @property
+    def journals(self) -> list[Journal]:
+        """All journal components in the calendar.
+
+        This is a shortcut to get all journals.
+        Modifications do not change the calendar.
+        Use :py:meth:`Component.add_component <icalendar.cal.component.Component.add_component>`.
+        """
+        return self.walk("VJOURNAL")
 
     @property
     def availabilities(self) -> list[Availability]:
@@ -185,7 +211,7 @@ class Calendar(Component):
 
         This is a shortcut to get all availabilities.
         Modifications do not change the calendar.
-        Use :py:meth:`Component.add_component`.
+        Use :py:meth:`Component.add_component <icalendar.cal.component.Component.add_component>`.
         """
         return self.walk("VAVAILABILITY")
 
@@ -195,7 +221,7 @@ class Calendar(Component):
 
         This is a shortcut to get all FreeBusy.
         Modifications do not change the calendar.
-        Use :py:meth:`Component.add_component`.
+        Use :py:meth:`Component.add_component <icalendar.cal.component.Component.add_component>`.
         """
         return self.walk("VFREEBUSY")
 
@@ -329,6 +355,7 @@ class Calendar(Component):
             >>> print(calendar.to_ical())
             BEGIN:VCALENDAR
             NAME:My Calendar
+            X-WR-CALNAME:My Calendar
             END:VCALENDAR
     """,
     )
@@ -364,6 +391,7 @@ class Calendar(Component):
             >>> print(calendar.to_ical())
             BEGIN:VCALENDAR
             DESCRIPTION:This is a calendar
+            X-WR-CALDESC:This is a calendar
             END:VCALENDAR
     """,
     )
