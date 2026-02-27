@@ -65,7 +65,7 @@ class vBoolean(int):
 
     @property
     def ical_value(self) -> bool:
-        """The icalendar boolean value converted to an iCalendar boolean value as described in :rfc:`5545#section-3.3.2."""
+        """BOOLEAN property type according to :rfc:`5545#section-3.3.2"""
         return bool(self)
 
     @classmethod
