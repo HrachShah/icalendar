@@ -30,15 +30,20 @@ def test_add_missing_timezones_does_not_generate_utc():
     assert "Europe/Zurich" in tz_names
 
 
-def test_utc_not_in_used_tzids():
-    """UTC must not appear in get_used_tzids() — it uses the Z suffix, not a TZID."""
-    event = Event.new(
-        summary="test",
-        start=datetime(2022, 1, 1, 12, 0, 0, tzinfo=timezone.utc),
-        end=datetime(2022, 1, 1, 13, 0, 0, tzinfo=timezone.utc),
-    )
-    calendar = Calendar.new(subcomponents=[event])
-    assert "UTC" not in calendar.get_used_tzids()
+def test_utc_not_in_missing_tzids():
+    """UTC must not appear in get_missing_tzids() — no VTIMEZONE should be generated.
+
+    Even if UTC were present in get_used_tzids() (e.g. from a legacy calendar
+    with TZID=UTC), get_missing_tzids() must filter it out so that
+    add_missing_timezones() never creates a VTIMEZONE for UTC.
+    Per :rfc:`5545` section 3.2.19, UTC datetimes use the Z suffix instead.
+    """
+    calendar = Calendar()
+    event = Event()
+    event.add("dtstart", datetime(2022, 1, 1, 12, 0, 0, tzinfo=timezone.utc))
+    event.add("dtend", datetime(2022, 1, 1, 13, 0, 0, tzinfo=timezone.utc))
+    calendar.add_component(event)
+    assert "UTC" not in calendar.get_missing_tzids()
 
 
 def test_get_missing_tzids_does_not_crash_with_extra_vtimezone():
