@@ -1,0 +1,344 @@
+===========
+Maintenance
+===========
+
+This chapter describes the maintenance structure of icalendar.
+
+icalendar Maintainers
+---------------------
+
+Currently the maintainers are the following people.
+
+- `@geier <https://github.com/geier>`_
+- `@jacadzaca <https://github.com/jacadzaca>`_
+- `@niccokunzmann <https://github.com/niccokunzmann>`_
+- `@SashankBhamidi <https://github.com/SashankBhamidi>`_
+
+Maintainers need the following permissions.
+
+``Admin`` access to the `repository <https://github.com/collective/icalendar>`_.
+    These can be enabled by a current maintainer or a GitHub organization administrator in the `settings <https://github.com/collective/icalendar/settings/access>`_.
+``Maintainer`` or ``Owner`` access to the `PyPI project <https://pypi.org/project/icalendar/>`_.
+    Each owner and maintainer needs a PyPI account.
+    All PyPI accounts require two-factor authentication (2FA) enabled.
+    Owners can invite either new owners or maintainers in the `collaboration Section <https://pypi.org/manage/project/icalendar/collaboration/>`_ on PyPI.
+``Maintainer`` access to the `Read the Docs project <https://app.readthedocs.org/projects/icalendar/>`_.
+    Existing maintainers can invite another maintainer through the `Maintainers <https://app.readthedocs.org/dashboard/icalendar/users/create/>`_ page.
+``Environments/Configure PyPI`` access for GitHub Workflows to grant new releases from tags.
+    Organization owners and repository administrators can grant this access in :menuselection:`Settings --> Environments --> PyPI`, or at https://github.com/collective/icalendar/settings/environments/674266024/edit, by adding their GitHub username to the list of :guilabel:`Required Reviewers`.
+``Owner`` or ``Manager`` access to ``icalendar-coc@googlegroups.com``
+    This Google Group is used for managing `Code of Conduct <https://pycal.org/code-of-conduct/>`_ infringement reports.
+    ``Manager``\ s may manage and moderate messages, whereas ``Owner``\ s may also manage members.
+    Management is performed through `Google Groups icalendar-coc settings <https://groups.google.com/g/icalendar-coc/settings>`_.
+``Registered`` access to the `OSS Fuzz issue tracker <https://issues.oss-fuzz.com/issues?q=icalendar>`_ for icalendar.
+    icalendar contributors use this issue tracker for managing :doc:`../how-to/fuzz-testing` issues that arise from time to time.
+    New issues do not get immediately disclosed to the public, and require that you register with a Google Account.
+    Add your Google Account's email address to `google/oss-fuzz <https://github.com/google/oss-fuzz/blob/master/projects/icalendar/project.yaml>`_, and create a pull request, to request the following access:
+
+    -   instant notification about fuzzing errors
+    -   undisclosed fuzzing issues
+
+    Existing issues will be disclosed after some time to the public.
+
+    .. seealso::
+
+        -   `Discussion about how to be added to OSS Fuzz <https://github.com/collective/icalendar/pull/574#issuecomment-1790554766>`_
+        -   :issue:`562`
+Maintainer in :file:`pyproject.toml`
+    Maintainers should be mentioned with or without email address in the :file:`pyproject.toml` file's `maintainers' section <https://github.com/collective/icalendar/blob/7ca9db18c0847d1530520e01baf75f8ab8f4fa06/pyproject.toml#L32>`_.
+
+Collaborators
+-------------
+
+Collaborators have write access to the repository.
+As a collaborator, you can
+
+-   merge pull requests,
+-   initiate a new release, and
+-   become a :ref:`code-owner`.
+
+The maintainers of icalendar want to have as many knowledgeable people with write access taking responsibility as possible for these reasons:
+
+-   a constant flow of fixes and new features
+-   better code review
+-   lower bus factor and backup
+-   future maintainers
+
+Nobody should merge their own pull requests.
+If you like to review or merge pull requests of other people and you have shown that you know how to contribute, you can ask to become a collaborator.
+A maintainer may ask if you would like to become one.
+
+
+.. _code-owner:
+
+Code owner
+----------
+
+A code owner is a type of collaborator or maintainer who is responsible for a specific part of the code.
+Code owners are automatically requested for review when someone opens a pull request that modifies code that they own.
+
+You may ask, or be invited, to become a code owner as part of becoming a collaborator or maintainer.
+When doing so, you or the inviter may submit a pull request to update the :file:`.github/CODEOWNERS` file.
+
+.. seealso:: `About code owners <https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners>`_
+
+Release versions
+----------------
+
+..  seealso:: 
+    :doc:`/reference/versions-branches`
+
+New releases
+------------
+
+This section explains how to create a new release on `PyPI <https://pypi.org/project/icalendar/>`_.
+
+Its examples were used for the 7.0.0 release of icalendar, a major release.
+Adjust the examples for the current release as needed.
+
+Since collaborators and maintainers have write access to the repository, they can start the release process.
+However, only people with ``Environments/Configure PyPI`` access can approve an automated release to PyPI.
+
+#.  Set an environment variable to use in subsequent commands during the release process.
+
+    .. code-block:: shell
+
+        export VERSION=7.0.0
+
+#.  Update the ``main`` branch.
+
+    .. code-block:: shell
+
+        git checkout main
+        git pull
+
+#.  When cutting any new release that you'll tag and want to be considered "stable" on either the ``main`` or development branch, update the Sphinx configuration file :file:`docs/conf.py` to match that version.
+
+    Hide the warning banner.
+
+    .. code-block:: python
+
+        html_theme_options = {
+            # ...
+            "show_version_warning_banner": False,
+
+#.  Check that the file :file:`CHANGES.rst` is up to date with the `latest merged pull requests <https://github.com/collective/icalendar/pulls?q=is%3Apr+is%3Amerged>`_, and the version you want to release is correctly named.
+    Change the date of the release, and remove empty sections.
+
+    .. code-block:: diff
+
+        -7.0.0 (unreleased)
+        +7.0.0 (2026-02-11)
+
+#.  Create a commit on a ``release`` branch to release this version.
+
+    .. code-block:: shell
+
+        git checkout -b release-$VERSION main
+        git add CHANGES.rst docs/conf.py
+        git commit -m"version $VERSION"
+
+#.  Push the commit and `create a pull request <https://github.com/collective/icalendar/compare?expand=1>`_.
+    Here is an `example pull request #457 <https://github.com/collective/icalendar/pull/457>`_.
+
+    .. code-block:: shell
+
+        git push -u origin release-$VERSION
+
+#.  See if the `CI tests <https://github.com/collective/icalendar/actions>`_ are running on the pull request.
+    If they are not running, no new release can be issued.
+    If the CI passes, merge the pull request.
+
+#.  Clean up behind you!
+
+    .. code-block:: shell
+
+        git checkout main
+        git pull
+        git branch -d release-$VERSION
+        git push -d origin release-$VERSION
+
+#.  Create a tag for the release on its release branch ``*.x`` and see if the `CI tests`_ are running.
+
+    .. code-block:: shell
+
+        git checkout main
+        git pull
+        git checkout 7.x
+        git merge main
+        git push upstream 7.x  # to collective/icalendar
+        git tag "v$VERSION"
+        git push upstream "v$VERSION" # to collective/icalendar
+
+    .. warning::
+
+        Once a tag is pushed to the repository, it must not be re-tagged or deleted.
+        This creates issues for downstream repositories.
+        See :issue:`1033`.
+
+#.  Once the tag is pushed and its `CI tests`_ pass, check the `GitHub Actions <https://github.com/collective/icalendar/actions>`_, and wait for maintainers to get an email:
+
+    .. code-block:: text
+
+        Subject: Deployment review in collective/icalendar
+
+        tests: PyPI is waiting for your review
+
+#.  If the release is approved by a maintainer, it will be pushed to `PyPI`_.
+#.  Copy this to the start of :file:`CHANGES.rst`, and increase the version number.
+
+    .. code-block:: shell
+
+        git checkout main
+        git pull
+
+    .. code-block:: text
+
+       7.0.1 (unreleased)
+       ------------------
+
+       Minor changes
+       ~~~~~~~~~~~~~
+
+       - ...
+
+       Breaking changes
+       ~~~~~~~~~~~~~~~~
+
+       - ...
+
+       New features
+       ~~~~~~~~~~~~
+
+       - ...
+
+       Bug fixes
+       ~~~~~~~~~
+
+       - ...
+
+       Documentation
+       ~~~~~~~~~~~~~
+
+       - ...
+
+#.  Push the changes to :file:`CHANGES.rst` so it is used for future changes.
+
+    .. code-block:: shell
+
+        git add CHANGES.rst
+        git commit -m "Add new CHANGELOG section for future release"
+        git push upstream main # to collective/icalendar
+
+#.  Once the release is pushed to `PyPI`_, notify the issues mentioned on the new release of the new release.
+    Example:
+
+    .. code-block:: text
+
+        This is included in v7.0.0.
+
+#.  Update the version switcher file :file:`docs/_static/version-switcher.json`.
+
+    .. note::
+
+        The remaining steps may be performed after the release because they pertain exclusively to documentation, which isn't included in the release.
+        The following examples were used for the 7.0.0 release.
+
+    #.  When cutting a new *major release* version, checkout the ``main`` branch, and update :file:`docs/_static/version-switcher.json` to match that version.
+    
+        ..  code-block:: shell
+        
+            git checkout main
+            git pull
+
+        #.  Duplicate the second previous major version stanza and renumber it to the first previous version.
+            In other words, duplicate the ``5.x`` stanza, and renumber the copy to ``6.x``.
+
+            .. code-block:: json
+
+                {
+                    "version": "6.x",
+                    "url": "https://icalendar.readthedocs.io/en/6.x/"
+                },
+
+        #.  Next, edit the array item for the previous version to reflect the current major release.
+
+            .. code-block:: json
+
+                {
+                    "name": "7.x (stable)",
+                    "version": "v7.0.0",
+                    "url": "https://icalendar.readthedocs.io/en/stable/",
+                    "preferred": "true"
+                },
+    
+
+    #.  When cutting a *minor or patch release* version, on the ``main`` branch, update :file:`docs/_static/version-switcher.json` to match that version's tag name.
+
+        .. code-block:: json
+
+            {
+                "name": "7.x (stable)",
+                "version": "v7.0.1",
+                "url": "https://icalendar.readthedocs.io/en/stable/",
+                "preferred": "true"
+            },
+
+#.  When cutting a new *stable release* version, update the Sphinx configuration file :file:`docs/conf.py` as shown.
+
+    #.  On the ``main`` branch, show the warning banner.
+
+        .. code-block:: python
+
+            html_theme_options = {
+                # ...
+                "show_version_warning_banner": True,
+
+    #.  On the previous numbered major release branch, show the warning banner.
+        For example, when releasing 7.0.0, checkout ``6.x``, and update it as shown.
+
+        .. code-block:: python
+
+            html_theme_options = {
+                # ...
+                "show_version_warning_banner": True,
+
+#.  Configure `Read the Docs <https://app.readthedocs.org/projects/icalendar/>`_.
+
+    #.  After a *minor release*, *patch release*, or an *unstable release*, deactivate previous releases in that release line.
+        Click on the ellipsis icon, and select :guilabel:`Configure version`.
+        Toggle the :guilabel:`Active` switch to deactivate the version.
+
+    #.  After a *major release*, verify that the version was activated automatically on Read the Docs.
+
+
+Links
+-----
+
+This section contains useful links for maintainers and collaborators.
+
+-   `Future of icalendar, looking for maintainer #360 <https://github.com/collective/icalendar/discussions/360>`_
+-   `Comment on the Plone tests running with icalendar <https://github.com/collective/icalendar/pull/447#issuecomment-1277643634>`_
+
+
+Updating Python versions
+------------------------
+
+When adding support for a new Python version, or removing support for an old one, the following files need to be updated:
+
+:file:`.github/workflows/tests.yml`
+    Upgrade Python versions.
+:file:`.github/workflows/*.py`
+    Add or remove the Python version from the test matrix.
+:file:`tox.ini`
+    Update the ``envlist`` to include or remove the Python version.
+:file:`pyproject.toml`
+    Update the ``requires-python`` line and the ``classifiers`` list.
+:file:`docs/reference/versions-branches.rst`
+    Update the compatibility information.
+:file:`docs/maintenance.rst`
+    Update this list if any new files need to be modified.
+`Branch Protection Rules <https://github.com/collective/icalendar/settings/branch_protection_rules>`_
+    Update the branch protection rules so that they match the required test names.
+
+Remember to write tests that completely cover the changes, and update any documentation that mentions supported Python versions.
