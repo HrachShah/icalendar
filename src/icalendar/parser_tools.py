@@ -56,7 +56,7 @@ def data_encode(
     if isinstance(data, str):
         return data.encode(encoding)
     if isinstance(data, dict):
-        return dict(map(data_encode, iter(data.items())))
+        return {key: data_encode(val, encoding) for key, val in data.items()}
     if isinstance(data, (list, tuple)):
         return list(map(data_encode, data))
     return data
