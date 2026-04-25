@@ -590,7 +590,10 @@ def _get_categories(component: Component) -> list[str]:
     if categories is None:
         categories = vCategory([])
         component.add("CATEGORIES", categories)
-    return categories.cats
+    # Return a copy so that mutating the returned list does not corrupt
+    # the internal vCategory.cats list (e.g. appending plain strings breaks
+    # serialization since vText coercion is lost).
+    return list(categories.cats)
 
 
 def _set_categories(component: Component, cats: Sequence[str] | None) -> None:
@@ -1225,8 +1228,9 @@ Description:
     type. The values correspond to those used by the FBTYPE"
     parameter used on a "FREEBUSY" property, with the exception that
     the "FREE" value is not used in this property.  If not specified
-    on a component that allows this property, the default is "BUSY-
-    UNAVAILABLE".
+    on a component that allows this property, the default value is
+    PUBLIC.  Applications MUST treat x-name and iana-token values they
+    don't recognize the same way as they would the PRIVATE value.
 """,
 )
 
@@ -1249,8 +1253,8 @@ Description:
 
     A CUA with a three-level priority scheme of "HIGH", "MEDIUM", and
     "LOW" is mapped into this property such that a property value in
-    the range of 1 to 4 specifies "HIGH" priority.  A value of 5 is
-    the normal or "MEDIUM" priority.  A value in the range of 6 to 9
+    the range of 1 to 4 specifies "HIGH" priority.  A property value of 5 is
+    the normal or "MEDIUM" priority.  A property value in the range of 6 to 9
     is "LOW" priority.
 
     A CUA with a priority schema of "A1", "A2", "A3", "B1", "B2", ...,
@@ -1265,7 +1269,7 @@ Description:
     priority for the event.  This property may be useful when more
     than one event is scheduled for a given time period.
 
-    Within a "VTODO" calendar component, this property specified a
+    Within a "VTODO" calendar component, this property specifies a
     priority for the to-do.  This property is useful in prioritizing
     multiple action items for a given time period.
 """,
@@ -1779,7 +1783,7 @@ def set_duration_with_locking(
         component.pop(end_property, None)  # Remove end property
         component.DURATION = duration
     elif locked == "end":
-        # Keep end locked, adjust start
+        # Keep end locked, adjust duration
         current_end = component.end
         component.DTSTART = current_end - duration
         component.pop(end_property, None)  # Remove end property
@@ -1819,11 +1823,7 @@ def set_start_with_locking(
 
     if locked == "duration":
         # Keep duration locked, adjust end
-        current_duration = (
-            component.duration
-            if "DURATION" in component or end_property in component
-            else None
-        )
+        current_duration = component.duration
         component.DTSTART = start
         if current_duration is not None:
             component.pop(end_property, None)  # Remove end property
@@ -1964,35 +1964,6 @@ def _get_conferences(self: Component) -> list[Conference]:
             CONFERENCE;VALUE=URI;FEATURE=AUDIO,VIDEO;
              LABEL=Attendee dial-in:https://chat.example.com/audio?id=123456
 
-        Get all conferences:
-
-        .. code-block:: pycon
-
-            >>> from icalendar import Event
-            >>> event = Event()
-            >>> event.conferences
-            []
-
-        Set a conference:
-
-        .. code-block:: pycon
-
-            >>> from icalendar import Event, Conference
-            >>> event = Event()
-            >>> event.conferences = [
-            ...     Conference(
-            ...         "tel:+1-412-555-0123,,,654321",
-            ...         feature="PHONE,MODERATOR",
-            ...         label="Moderator dial-in",
-            ...         language="EN",
-            ...     )
-            ... ]
-            >>> print(event.to_ical())
-            BEGIN:VEVENT
-            CONFERENCE;FEATURE="PHONE,MODERATOR";LABEL=Moderator dial-in;LANGUAGE=EN;V
-             ALUE=URI:tel:+1-412-555-0123,,,654321
-            END:VEVENT
-
     """
     conferences = self.get("CONFERENCE", [])
     if not isinstance(conferences, SEQUENCE_TYPES):
@@ -2123,7 +2094,7 @@ def _get_links(self: Component) -> list[vUri | vUid | vXmlReference]:
     """
     links = self.get("LINK", [])
     if not isinstance(links, list):
-        links = [links]
+        return [links]
     return links
 
 
@@ -2383,7 +2354,7 @@ def multi_string_property(name: str, doc: str):
             value = [value]
         return value
 
-    def fset(self: Component, value: list[str] | str | None) -> None:
+    def fset(self: Component, value: list[str] | str | None):
         """Set the values of a multi-string property."""
         fdel(self)
         if value is None:
