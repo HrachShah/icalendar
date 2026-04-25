@@ -3,7 +3,7 @@
 
 import argparse
 import sys
-from datetime import datetime
+from datetime import datetime, date
 from pathlib import Path
 
 from icalendar import __version__, vCalAddress
@@ -62,18 +62,28 @@ def view(event: Event) -> str:
     description = event.get("description", "").split("\n")
     description = "\n".join(s.rjust(len(s) + 5) for s in description)
 
-    start = event.decoded("dtstart")
-    if "duration" in event:
-        end = event.decoded("dtend", default=start + event.decoded("duration"))
-    else:
-        end = event.decoded("dtend", default=start)
-    duration = event.decoded("duration", default=end - start)
+    start = event.decoded("dtstart", default=None)
+    end = None
+    if start is not None:
+        if "duration" in event:
+            end = event.decoded("dtend", default=start + event.decoded("duration"))
+        else:
+            end = event.decoded("dtend", default=start)
+    duration = event.decoded("duration", default=None)
+    if start and end and duration is None:
+        duration = end - start if isinstance(end, type(start)) else ""
     if isinstance(start, datetime):
         start = start.astimezone()
-    start = start.strftime("%c")
+        start = start.strftime("%c")
+    elif isinstance(start, date):
+        start = start.strftime("%c")  # e.g. "Wed May 11 00:00:00 2022"
+    else:
+        start = str(start) if start else ""
     if isinstance(end, datetime):
         end = end.astimezone()
-    end = end.strftime("%c")
+        end = end.strftime("%c")
+    else:
+        end = str(end) if end else ""
 
     return f"""    Organizer: {organizer}
     Attendees:
