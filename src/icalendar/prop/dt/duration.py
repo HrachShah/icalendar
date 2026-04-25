@@ -109,7 +109,7 @@ class vDuration(TimeBase):
             seconds = td.seconds % 60
             if hours:
                 timepart += f"{hours}H"
-            if minutes:
+            if minutes or (minutes == 0 and hours and seconds):
                 timepart += f"{minutes}M"
             if seconds:
                 timepart += f"{seconds}S"
