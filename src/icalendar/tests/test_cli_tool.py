@@ -103,6 +103,12 @@ class CLIToolTest(unittest.TestCase):
             output += cli.view(event) + "\n\n"
         assert output == PROPER_OUTPUT
 
+    def test_format_attendees_handles_none(self):
+        assert cli._format_attendees(None) == ""
+
+    def test_format_attendees_handles_empty_list(self):
+        assert cli._format_attendees([]) == ""
+
 
 if __name__ == "__main__":
     unittest.main()

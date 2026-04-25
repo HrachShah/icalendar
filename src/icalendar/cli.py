@@ -41,7 +41,7 @@ def _format_attendees(attendees: list | str | vCalAddress) -> str:
     """
     if isinstance(attendees, str):
         attendees = [attendees]
-    return "\n".join(s.rjust(len(s) + 5) for s in map(_format_name, attendees))
+    return "\n".join(s.rjust(len(s) + 5) for s in map(_format_name, attendees or []))
 
 
 def view(event: Event) -> str:
