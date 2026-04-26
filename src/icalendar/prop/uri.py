@@ -78,7 +78,7 @@ class vUri(str):
         try:
             return cls(ical)
         except Exception as e:
-            raise ValueError(f"Expected , got: {ical}") from e
+            raise ValueError(f"Expected URI, got: {ical}") from e
 
     @classmethod
     def examples(cls) -> list[Self]:
