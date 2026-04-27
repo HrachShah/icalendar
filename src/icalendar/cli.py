@@ -82,6 +82,8 @@ def view(event: Event) -> str:
     if isinstance(end, datetime):
         end = end.astimezone()
         end = end.strftime("%c")
+    elif isinstance(end, date):
+        end = end.strftime("%c")
     else:
         end = str(end) if end else ""
 
