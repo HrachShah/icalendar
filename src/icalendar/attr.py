@@ -1869,7 +1869,16 @@ def set_end_with_locking(
         setattr(component, end_property, end)
     elif locked == "duration":
         # Keep duration locked, adjust start
-        current_duration = component.duration
+        # Guard against components missing both DURATION and end property,
+        # which would cause component.duration to raise IncompleteComponent.
+        current_duration = (
+            component.duration
+            if "DURATION" in component or end_property in component or "DTSTART" in component
+            else None
+        )
+        if current_duration is None:
+            msg = f"Cannot keep duration locked: component has no existing duration to preserve"
+            raise ValueError(msg)
         component.DTSTART = end - current_duration
         component.pop(end_property, None)  # Remove end property
         component.DURATION = current_duration
