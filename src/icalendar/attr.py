@@ -1823,7 +1823,14 @@ def set_start_with_locking(
 
     if locked == "duration":
         # Keep duration locked, adjust end
-        current_duration = component.duration
+        # Only call component.duration when there is something to compute it from;
+        # calling it when neither DURATION, DTEND/DUE, nor DTSTART exists raises
+        # IncompleteComponent (duration falls back to end - start, both absent).
+        current_duration = (
+            component.duration
+            if "DURATION" in component or end_property in component or "DTSTART" in component
+            else None
+        )
         component.DTSTART = start
         if current_duration is not None:
             component.pop(end_property, None)  # Remove end property
