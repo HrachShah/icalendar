@@ -5,6 +5,7 @@ import argparse
 import sys
 from datetime import datetime, date
 from pathlib import Path
+from typing import TextIO
 
 from icalendar import __version__, vCalAddress
 from icalendar.cal.calendar import Calendar
@@ -120,35 +121,29 @@ def main():
 
     argv = parser.parse_args()
 
-    # Open output file
+    # Use context managers for automatic and reliable resource cleanup.
+    # This avoids the fragile flag-variable pattern that can leave files
+    # open or raise NameError when exceptions occur before flags are set.
     if argv.output == "-":
-        output_file = sys.stdout
-        close_output = False
-    else:
-        output_file = Path(argv.output).open("w", encoding="utf-8")  # noqa: SIM115
-        close_output = True
-
-    try:
-        # Iterate over input paths
+        output_file: TextIO = sys.stdout
         for path in argv.calendar_files:
-            if path == "-":
-                f = sys.stdin
-                close_input = False
-            else:
-                f = Path(path).open(encoding="utf-8-sig")  # noqa: SIM115
-                close_input = True
-
+            f = sys.stdin if path == "-" else Path(path).open(encoding="utf-8-sig")
             try:
                 calendar = Calendar.from_ical(f.read())
                 output_file.writelines(
                     view(event) + "\n\n" for event in calendar.walk("vevent")
                 )
             finally:
-                if close_input:
+                if path != "-":
                     f.close()
-    finally:
-        if close_output:
-            output_file.close()
+    else:
+        with Path(argv.output).open("w", encoding="utf-8") as output_file:
+            for path in argv.calendar_files:
+                with Path(path).open(encoding="utf-8-sig") as f:
+                    calendar = Calendar.from_ical(f.read())
+                    output_file.writelines(
+                        view(event) + "\n\n" for event in calendar.walk("vevent")
+                    )
 
 
 __all__ = ["main", "view"]
