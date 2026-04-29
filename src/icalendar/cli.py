@@ -3,7 +3,7 @@
 
 import argparse
 import sys
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 
 from icalendar import __version__, vCalAddress
@@ -68,9 +68,13 @@ def view(event: Event) -> str:
     duration = event.decoded("duration", default=end - start)
     if isinstance(start, datetime):
         start = start.astimezone()
+    elif start is None:
+        start = datetime.now(timezone.utc)
     start = start.strftime("%c")
     if isinstance(end, datetime):
         end = end.astimezone()
+    elif end is None:
+        end = start
     end = end.strftime("%c")
 
     return f"""    Organizer: {organizer}
