@@ -109,20 +109,16 @@ def main():
     # Open output file
     if argv.output == "-":
         output_file = sys.stdout
-        close_output = False
     else:
         output_file = Path(argv.output).open("w", encoding="utf-8")  # noqa: SIM115
-        close_output = True
 
     try:
         # Iterate over input paths
         for path in argv.calendar_files:
             if path == "-":
                 f = sys.stdin
-                close_input = False
             else:
                 f = Path(path).open(encoding="utf-8-sig")  # noqa: SIM115
-                close_input = True
 
             try:
                 calendar = Calendar.from_ical(f.read())
@@ -130,10 +126,10 @@ def main():
                     view(event) + "\n\n" for event in calendar.walk("vevent")
                 )
             finally:
-                if close_input:
+                if f is not sys.stdin:
                     f.close()
     finally:
-        if close_output:
+        if argv.output != "-":
             output_file.close()
 
 
