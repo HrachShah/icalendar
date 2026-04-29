@@ -66,6 +66,17 @@ def view(event: Event) -> str:
     else:
         end = event.decoded("dtend", default=start)
     duration = event.decoded("duration", default=end - start)
+    # timedelta has no strftime method — format it as a human-readable string.
+    if not isinstance(duration, datetime):
+        total_secs = int(duration.total_seconds())
+        hours, remainder = divmod(total_secs, 3600)
+        minutes, seconds = divmod(remainder, 60)
+        if hours:
+            duration = f"{hours}h {minutes}m"
+        elif minutes:
+            duration = f"{minutes}m {seconds}s"
+        else:
+            duration = f"{seconds}s"
     if isinstance(start, datetime):
         start = start.astimezone()
     elif start is None:
