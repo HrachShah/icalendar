@@ -1733,7 +1733,15 @@ def get_duration_property(component: Component) -> timedelta:
         return component["DURATION"].dt
 
     # Fall back to calculated duration from start and end
-    return component.end - component.start
+    try:
+        end = component.end
+        start = component.start
+    except IncompleteComponent:
+        raise IncompleteComponent(
+            f"Cannot compute duration for {component.name}: "
+            "no DURATION property and no DTSTART+DTEND/DUE pair."
+        )
+    return end - start
 
 
 def set_duration_with_locking(
