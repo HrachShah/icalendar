@@ -15,18 +15,41 @@ def _format_name(address: str) -> str:
     """Format a display name and email from an address string.
 
     Parameters:
-        address: An address object, such as mailto:name@example.com.
+        address: An address object, such as mailto:name@example.com,
+            a vCalAddress object, a CN= display name (with optional mailto:),
+            or None.
 
     Returns:
         A formatted string, like 'name <name@example.com>',
         or an empty string if no email is found.
     """
-    email = address.rsplit(":", maxsplit=1)[-1]
-    name = email.split("@")[0]
-    if not email:
+    if address is None:
         return ""
-    return f"{name} <{email}>"
 
+    display_name = None
+
+    # Handle CN= display name format, e.g. "CN=John Doe,mailto:john@example.com"
+    # or "CN=John Doe (guest)"
+    if address.startswith("CN="):
+        parts = address.split(",", 1)
+        display_name = parts[0][3:].strip()  # Remove "CN=" prefix
+        # If there's a mailto: part after the comma, use its email
+        if len(parts) > 1:
+            email = parts[1].rsplit("mailto:", 1)[-1]
+        else:
+            email = None
+    else:
+        # Strip mailto: prefix for consistent parsing
+        stripped = address.rsplit("mailto:", 1)[-1]
+        email = stripped if "@" in stripped else None
+
+    if not email:
+        return display_name or ""
+
+    if not display_name:
+        display_name = email.split("@")[0]
+
+    return f"{display_name} <{email}>"
 
 def _format_attendees(attendees: list | str | vCalAddress) -> str:
     """Format the list of attendees.
