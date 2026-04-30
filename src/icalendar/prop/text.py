@@ -126,10 +126,18 @@ class vText(str):
             from icalendar.prop import vCategory
 
             return vCategory.from_jcal(jcal_property)
-        string = jcal_property[3]  # TODO: accept list or string but join with ;
         if name == "request-status":  # TODO: maybe add a vRequestStatus class?
-            JCalParsingError.validate_list_type(jcal_property[3], str, cls, 3)
-            string = ";".join(jcal_property[3])
+            # jCal represents request-status as a list ["code"; "description"; "extra"]
+            # but it may also appear as a single string in some round-trip scenarios
+            raw = jcal_property[3]
+            if isinstance(raw, list):
+                JCalParsingError.validate_list_type(raw, str, cls, 3)
+                string = ";".join(raw)
+            else:
+                JCalParsingError.validate_value_type(raw, str, cls, 3)
+                string = raw
+        else:
+            string = jcal_property[3]
         JCalParsingError.validate_value_type(string, str, cls, 3)
         return cls(
             string,
