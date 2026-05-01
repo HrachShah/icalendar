@@ -113,16 +113,16 @@ def _unescape_char(text: str | bytes) -> str | bytes | None:
             .replace("\\;", ";")
             .replace("\\\\", "\\")
         )
-    if isinstance(text, bytes):
-        return (
-            text.replace(b"\\N", b"\\n")
-            .replace(b"\r\n", b"\n")
-            .replace(b"\\n", b"\n")
-            .replace(b"\\,", b",")
-            .replace(b"\\;", b";")
-            .replace(b"\\\\", b"\\")
-        )
-    return None
+    # text is bytes — the assert above guarantees it is one of str or bytes,
+    # so no explicit None fallback is needed here.
+    return (
+        text.replace(b"\\N", b"\\n")
+        .replace(b"\r\n", b"\n")
+        .replace(b"\\n", b"\n")
+        .replace(b"\\,", b",")
+        .replace(b"\\;", b";")
+        .replace(b"\\\\", b"\\")
+    )
 
 
 def unescape_char(text: str | bytes) -> str | bytes | None:
