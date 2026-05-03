@@ -75,6 +75,8 @@ class vUri(str):
 
     @classmethod
     def from_ical(cls, ical: str | bytes) -> Self:
+        if ical is None:
+            raise ValueError("Expected URI, got: None")
         try:
             return cls(ical)
         except Exception as e:
