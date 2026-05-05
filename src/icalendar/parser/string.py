@@ -261,12 +261,17 @@ def _unescape_string(val: str) -> str:
         - ``%3A`` -> ``:``
         - ``%3B`` -> ``;``
         - ``%5C`` -> ``\``
+
+        The ``%5C`` (backslash) must be decoded before ``%3B`` (semicolon)
+        to avoid double-decoding: ``_escape_string`` encodes ``\\`` as
+        ``%5C``, then ``\;`` as ``%3B``, producing ``\\%3B``. Decoding ``%3B``
+        first would leave a stray backslash, so ``%5C`` is decoded first.
     """
     return (
         val.replace("%2C", ",")
         .replace("%3A", ":")
-        .replace("%3B", ";")
         .replace("%5C", "\\")
+        .replace("%3B", ";")
     )
 
 
