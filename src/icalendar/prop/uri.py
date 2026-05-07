@@ -79,7 +79,7 @@ class vUri(str):
             raise ValueError("Expected URI, got: None")
         try:
             return cls(ical)
-        except Exception as e:
+        except (ValueError, TypeError) as e:
             raise ValueError(f"Expected URI, got: {ical}") from e
 
     @classmethod
