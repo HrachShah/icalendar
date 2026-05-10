@@ -193,9 +193,7 @@ class vRecur(CaselessDict):
         return [parser.from_ical(v) for v in values.split(",")]
 
     @classmethod
-    def from_ical(cls, ical: str):
-        if isinstance(ical, cls):
-            return ical
+    def from_ical(cls, ical):
         try:
             recur = cls()
             for pairs in ical.split(";"):
@@ -209,7 +207,7 @@ class vRecur(CaselessDict):
             return cls(recur)
         except ValueError:
             raise
-        except Exception as e:
+        except (AttributeError, TypeError) as e:
             raise ValueError(f"Error in recurrence rule: {ical}") from e
 
     @classmethod

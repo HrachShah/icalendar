@@ -179,13 +179,16 @@ class vTime(TimeBase):
             utc = ical.endswith("Z")
             if utc:
                 ical = ical[:-1]
-            timetuple = (int(ical[:2]), int(ical[2:4]), int(ical[4:6]))
+            hour = int(ical[:2])
+            minute = int(ical[2:4])
+            second = int(ical[4:6])
+            timetuple = (hour, minute, second)
             if tzinfo:
                 return tzp.localize(time(*timetuple), tzinfo)
             if utc:
                 return tzp.localize_utc(time(*timetuple))
             return time(*timetuple)
-        except Exception as e:
+        except (ValueError, TypeError) as e:
             raise ValueError(f"Expected time, got: {ical}") from e
 
     @classmethod

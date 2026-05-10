@@ -69,9 +69,9 @@ class vGeo:
     default_value: ClassVar[str] = "FLOAT"
     params: Parameters
 
-    def __init__(
-        self,
-        geo: tuple[float | str | int, float | str | int],
+    def __new__(
+        cls,
+        geo,
         /,
         params: dict[str, Any] | None = None,
     ):
@@ -84,13 +84,14 @@ class vGeo:
             latitude, longitude = (geo[0], geo[1])
             latitude = float(latitude)
             longitude = float(longitude)
-        except Exception as e:
+        except (ValueError, TypeError, IndexError) as e:
             raise ValueError(
                 "Input must be (float, float) for latitude and longitude"
             ) from e
         self.latitude = latitude
         self.longitude = longitude
         self.params = Parameters(params)
+        return self
 
     def to_ical(self) -> str:
         return f"{self.latitude};{self.longitude}"
@@ -100,7 +101,7 @@ class vGeo:
         try:
             latitude, longitude = ical.split(";")
             return (float(latitude), float(longitude))
-        except Exception as e:
+        except (ValueError, AttributeError) as e:
             raise ValueError(f"Expected 'float;float' , got: {ical}") from e
 
     def __eq__(self, other: object) -> bool:
