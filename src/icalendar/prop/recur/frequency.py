@@ -48,7 +48,7 @@ class vFrequency(str):
     def from_ical(cls, ical):
         try:
             return cls(ical.upper())
-        except Exception as e:
+        except ValueError as e:
             raise ValueError(f"Expected frequency, got: {ical}") from e
 
     @classmethod
