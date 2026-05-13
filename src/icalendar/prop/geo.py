@@ -84,10 +84,10 @@ class vGeo:
             latitude, longitude = (geo[0], geo[1])
             latitude = float(latitude)
             longitude = float(longitude)
-        except Exception as e:
+        except (ValueError, TypeError):
             raise ValueError(
                 "Input must be (float, float) for latitude and longitude"
-            ) from e
+            ) from None
         self.latitude = latitude
         self.longitude = longitude
         self.params = Parameters(params)
@@ -100,8 +100,8 @@ class vGeo:
         try:
             latitude, longitude = ical.split(";")
             return (float(latitude), float(longitude))
-        except Exception as e:
-            raise ValueError(f"Expected 'float;float' , got: {ical}") from e
+        except (ValueError, TypeError):
+            raise ValueError(f"Expected 'float;float' , got: {ical}") from None
 
     def __eq__(self, other: object) -> bool:
         return isinstance(other, vGeo) and self.to_ical() == other.to_ical()
