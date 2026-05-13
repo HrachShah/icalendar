@@ -198,19 +198,19 @@ class vRecur(CaselessDict):
             return ical
         try:
             recur = cls()
-            for pairs in ical.split(";"):
-                try:
-                    key, vals = pairs.split("=")
-                except ValueError:
-                    # E.g. incorrect trailing semicolon, like (issue #157):
-                    # FREQ=YEARLY;BYMONTH=11;BYDAY=1SU;
+            for line in ical.split(";"):
+                if not line:
                     continue
+                # E.g. incorrect trailing semicolon, like (issue #157):
+                # FREQ=YEARLY;BYMONTH=11;BYDAY=1SU;
+                key, vals = line.split("=", 1)
+                vals = vals.split(";")
                 recur[key] = cls.parse_type(key, vals)
             return cls(recur)
         except ValueError:
             raise
-        except Exception as e:
-            raise ValueError(f"Error in recurrence rule: {ical}") from e
+        except (ValueError, TypeError, AttributeError):
+            raise ValueError(f"Error in recurrence rule: {ical}") from None
 
     @classmethod
     def examples(cls) -> list[Self]:

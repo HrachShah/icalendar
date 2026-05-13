@@ -139,8 +139,8 @@ class vPeriod(TimeBase):
             start, end_or_duration = ical.split("/")
             start = vDDDTypes.from_ical(start, timezone=timezone)
             end_or_duration = vDDDTypes.from_ical(end_or_duration, timezone=timezone)
-        except Exception as e:
-            raise ValueError(f"Expected period format, got: {ical}") from e
+        except (ValueError, TypeError, AttributeError):
+            raise ValueError(f"Expected period format, got: {ical}") from None
         return (start, end_or_duration)
 
     def __repr__(self):
