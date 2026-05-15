@@ -106,34 +106,25 @@ def main():
 
     argv = parser.parse_args()
 
-    # Open output file
-    if argv.output == "-":
-        output_file = sys.stdout
-        close_output = False
-    else:
-        output_file = Path(argv.output).open("w", encoding="utf-8")  # noqa: SIM115
-        close_output = True
+    output_file = (
+        sys.stdout
+        if argv.output == "-"
+        else Path(argv.output).open("w", encoding="utf-8")
+    )
 
     try:
-        # Iterate over input paths
         for path in argv.calendar_files:
-            if path == "-":
-                f = sys.stdin
-                close_input = False
-            else:
-                f = Path(path).open(encoding="utf-8-sig")  # noqa: SIM115
-                close_input = True
-
-            try:
+            with (
+                sys.stdin
+                if path == "-"
+                else Path(path).open(encoding="utf-8-sig") as f
+            ):
                 calendar = Calendar.from_ical(f.read())
                 output_file.writelines(
-                    view(event) + "\n\n" for event in calendar.walk("vevent")
+                    view(event) + "\n\n" for event in calendar.walk("VEVENT")
                 )
-            finally:
-                if close_input:
-                    f.close()
     finally:
-        if close_output:
+        if argv.output != "-":
             output_file.close()
 
 
