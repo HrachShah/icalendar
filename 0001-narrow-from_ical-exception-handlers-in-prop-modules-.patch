@@ -1,0 +1,98 @@
+From 87dc6bb3b5406c7dcc7205307ebae32b58627f7e Mon Sep 17 00:00:00 2001
+From: Zo Bot <github-automation@zo.computer>
+Date: Thu, 14 May 2026 20:11:45 +0000
+Subject: [PATCH] =?UTF-8?q?narrow=20from=5Fical=20exception=20handlers=20i?=
+ =?UTF-8?q?n=20prop=20modules=20=E2=80=94=20Contentline.from=5Fical=20rais?=
+ =?UTF-8?q?es=20(ValueError,=20TypeError),=20boolean=20raises=20(ValueErro?=
+ =?UTF-8?q?r,=20KeyError),=20date=20raises=20(ValueError,=20TypeError),=20?=
+ =?UTF-8?q?float=20raises=20(ValueError,=20TypeError),=20geo=20raises=20(V?=
+ =?UTF-8?q?alueError,=20TypeError,=20IndexError)?=
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+---
+ src/icalendar/parser/content_line.py | 2 +-
+ src/icalendar/prop/boolean.py        | 2 +-
+ src/icalendar/prop/dt/date.py        | 2 +-
+ src/icalendar/prop/float.py          | 2 +-
+ src/icalendar/prop/geo.py            | 4 ++--
+ 5 files changed, 6 insertions(+), 6 deletions(-)
+
+diff --git a/src/icalendar/parser/content_line.py b/src/icalendar/parser/content_line.py
+index 4f36d06e..4159dcd8 100644
+--- a/src/icalendar/parser/content_line.py
++++ b/src/icalendar/parser/content_line.py
+@@ -257,7 +257,7 @@ class Contentlines(list[Contentline]):
+             unfolded = UFOLD.sub("", st)
+             lines = cls(Contentline(line) for line in NEWLINE.split(unfolded) if line)
+             lines.append("")  # '\r\n' at the end of every content line
+-        except Exception as e:
++        except (ValueError, TypeError) as e:
+             raise ValueError("Expected StringType with content lines") from e
+         return lines
+ 
+diff --git a/src/icalendar/prop/boolean.py b/src/icalendar/prop/boolean.py
+index 5ca903f5..8deec2ab 100644
+--- a/src/icalendar/prop/boolean.py
++++ b/src/icalendar/prop/boolean.py
+@@ -78,7 +78,7 @@ class vBoolean(int):
+     def from_ical(cls, ical: str) -> bool:
+         try:
+             return cls.BOOL_MAP[ical]
+-        except Exception as e:
++        except (ValueError, KeyError) as e:
+             raise ValueError(f"Expected 'TRUE' or 'FALSE'. Got {ical}") from e
+ 
+     @classmethod
+diff --git a/src/icalendar/prop/dt/date.py b/src/icalendar/prop/dt/date.py
+index 40ee2e07..74525535 100644
+--- a/src/icalendar/prop/dt/date.py
++++ b/src/icalendar/prop/dt/date.py
+@@ -83,7 +83,7 @@ class vDate(TimeBase):
+                 int(ical[6:8]),  # day
+             )
+             return date(*timetuple)
+-        except Exception as e:
++        except (ValueError, TypeError) as e:
+             raise ValueError(f"Wrong date format {ical}") from e
+ 
+     @classmethod
+diff --git a/src/icalendar/prop/float.py b/src/icalendar/prop/float.py
+index 1fd286fe..0fcb7e34 100644
+--- a/src/icalendar/prop/float.py
++++ b/src/icalendar/prop/float.py
+@@ -70,7 +70,7 @@ class vFloat(float):
+     def from_ical(cls, ical: str | float) -> Self:
+         try:
+             return cls(ical)
+-        except Exception as e:
++        except (ValueError, TypeError) as e:
+             raise ValueError(f"Expected float value, got: {ical}") from e
+ 
+     @classmethod
+diff --git a/src/icalendar/prop/geo.py b/src/icalendar/prop/geo.py
+index c598b03a..06e3bffd 100644
+--- a/src/icalendar/prop/geo.py
++++ b/src/icalendar/prop/geo.py
+@@ -84,7 +84,7 @@ class vGeo:
+             latitude, longitude = (geo[0], geo[1])
+             latitude = float(latitude)
+             longitude = float(longitude)
+-        except Exception as e:
++        except (ValueError, TypeError, IndexError) as e:
+             raise ValueError(
+                 "Input must be (float, float) for latitude and longitude"
+             ) from e
+@@ -100,7 +100,7 @@ class vGeo:
+         try:
+             latitude, longitude = ical.split(";")
+             return (float(latitude), float(longitude))
+-        except Exception as e:
++        except (ValueError, TypeError, IndexError) as e:
+             raise ValueError(f"Expected 'float;float' , got: {ical}") from e
+ 
+     def __eq__(self, other: object) -> bool:
+-- 
+2.39.5
+
