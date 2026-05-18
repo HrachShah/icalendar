@@ -248,7 +248,7 @@ class Alarm(Component):
                 end.append(trigger)
                 add = end
             duration = self.DURATION
-            if duration is not None:
+            if duration is not None and self.REPEAT:
                 for _ in range(self.REPEAT):
                     add.append(add[-1] + duration)
         return self.Triggers(
