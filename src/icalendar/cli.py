@@ -11,17 +11,21 @@ from icalendar.cal.calendar import Calendar
 from icalendar.cal.event import Event
 
 
-def _format_name(address: str) -> str:
+def _format_name(address: str | vCalAddress) -> str:
     """Format a display name and email from an address string.
 
     Parameters:
-        address: An address object, such as mailto:name@example.com.
+        address: A string like 'mailto:name@example.com' or a
+            vCalAddress object containing a CAL-ADDRESS value.
 
     Returns:
         A formatted string, like 'name <name@example.com>',
         or an empty string if no email is found.
     """
-    email = address.rsplit(":", maxsplit=1)[-1]
+    if isinstance(address, vCalAddress):
+        email = str(address)
+    else:
+        email = address.rsplit(":", maxsplit=1)[-1]
     name = email.split("@")[0]
     if not email:
         return ""
