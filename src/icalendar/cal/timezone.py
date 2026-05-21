@@ -354,7 +354,7 @@ class Timezone(Component):
         """
         tz = tzp.timezone(tzid)
         if tz is None:
-            raise ValueError(f"Unkown timezone {tzid}.")
+            raise ValueError(f"Unknown timezone {tzid}.")
         return cls.from_tzinfo(tz, tzid, first_date, last_date)
 
     @property
