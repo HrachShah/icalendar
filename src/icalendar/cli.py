@@ -116,6 +116,7 @@ def main():
 
     try:
         # Iterate over input paths
+        close_input = False
         for path in argv.calendar_files:
             if path == "-":
                 f = sys.stdin
