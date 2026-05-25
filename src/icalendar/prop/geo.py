@@ -84,7 +84,7 @@ class vGeo:
             latitude, longitude = (geo[0], geo[1])
             latitude = float(latitude)
             longitude = float(longitude)
-        except Exception as e:
+        except (TypeError, ValueError, IndexError) as e:
             raise ValueError(
                 "Input must be (float, float) for latitude and longitude"
             ) from e
