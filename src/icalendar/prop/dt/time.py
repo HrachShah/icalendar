@@ -185,8 +185,8 @@ class vTime(TimeBase):
             if utc:
                 return tzp.localize_utc(time(*timetuple))
             return time(*timetuple)
-        except Exception as e:
-            raise ValueError(f"Expected time, got: {ical}") from e
+        except (ValueError, TypeError, IndexError):
+            raise ValueError(f"Expected time, got: {ical}")
 
     @classmethod
     def examples(cls) -> list[Self]:
