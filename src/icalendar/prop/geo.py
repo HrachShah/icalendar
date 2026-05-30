@@ -100,7 +100,7 @@ class vGeo:
         try:
             latitude, longitude = ical.split(";")
             return (float(latitude), float(longitude))
-        except Exception as e:
+        except (AttributeError, ValueError) as e:
             raise ValueError(f"Expected 'float;float' , got: {ical}") from e
 
     def __eq__(self, other: object) -> bool:
