@@ -208,8 +208,8 @@ class vRecur(CaselessDict):
                 recur[key] = cls.parse_type(key, vals)
             return cls(recur)
         except ValueError:
-            raise
-        except Exception as e:
+            raise  # let vRecur's own ValueErrors through
+        except (ValueError, TypeError, IndexError, KeyError) as e:
             raise ValueError(f"Error in recurrence rule: {ical}") from e
 
     @classmethod
