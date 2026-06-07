@@ -84,7 +84,13 @@ class vGeo:
             latitude, longitude = (geo[0], geo[1])
             latitude = float(latitude)
             longitude = float(longitude)
-        except Exception as e:
+        except (ValueError, TypeError, IndexError) as e:
+            # geo[0]/geo[1] raises IndexError on short tuples, float() raises
+            # ValueError on unparseable strings and TypeError on non-numeric
+            # types (e.g. None, list, dict). The previous bare 'except Exception'
+            # also silently caught AttributeError, RuntimeError, etc., so a real
+            # bug in a custom float subclass would surface as a misleading
+            # 'Input must be (float, float)' message.
             raise ValueError(
                 "Input must be (float, float) for latitude and longitude"
             ) from e
