@@ -48,7 +48,13 @@ class vFrequency(str):
     def from_ical(cls, ical):
         try:
             return cls(ical.upper())
-        except Exception as e:
+        except (ValueError, TypeError) as e:
+            # to_unicode raises TypeError on bytes/None and the frequencies
+            # membership check raises ValueError. The old bare 'except
+            # Exception' also caught AttributeError / RuntimeError and any
+            # future bug in a custom str subclass, surfacing it as a
+            # misleading 'Expected frequency' message that hid the real
+            # traceback.
             raise ValueError(f"Expected frequency, got: {ical}") from e
 
     @classmethod

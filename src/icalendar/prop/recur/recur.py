@@ -209,7 +209,18 @@ class vRecur(CaselessDict):
             return cls(recur)
         except ValueError:
             raise
-        except Exception as e:
+        except (TypeError, KeyError, AttributeError) as e:
+            # The body of the try only does .split() (TypeError on non-str
+            # input), a dict subscript + cls.parse_type (KeyError if a part
+            # of the rule references an unknown key after being routed
+            # through cls.types), and CaselessDict assignment
+            # (AttributeError if cls() fails to initialize). The old bare
+            # 'except Exception' also caught RuntimeError, RecursionError,
+            # and any future bug introduced by a new parse_type subclass
+            # and silently rewrote it as 'Error in recurrence rule', which
+            # made real parser bugs look like user input errors and broke
+            # the test_error_tolerant_parsing suite. Narrow the catch to
+            # the three real types the body can raise.
             raise ValueError(f"Error in recurrence rule: {ical}") from e
 
     @classmethod

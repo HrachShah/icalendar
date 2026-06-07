@@ -90,8 +90,17 @@ class vWeekday(str):
     def from_ical(cls, ical):
         try:
             return cls(ical.upper())
-        except Exception as e:
-            raise ValueError(f"Expected weekday abbreviation, got: {ical}") from e
+        except (ValueError, TypeError) as e:
+            # to_unicode raises TypeError on bytes/None, and the WEEKDAY_RULE
+            # match / int(relative) / membership checks raise ValueError. The
+            # old bare 'except Exception' also silently caught AttributeError,
+            # RuntimeError, and any future bug in a custom str subclass and
+            # surfaced them as a misleading 'Expected weekday abbreviation'
+            # message, which broke the error-tolerant parser's attempts to
+            # distinguish user input errors from real library bugs.
+            raise ValueError(
+                f"Expected weekday abbreviation, got: {ical}"
+            ) from e
 
     @classmethod
     def parse_jcal_value(cls, value: Any) -> Self:
