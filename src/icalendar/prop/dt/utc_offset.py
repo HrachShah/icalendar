@@ -117,6 +117,11 @@ class vUTCOffset:
         if isinstance(ical, cls):
             return ical.td
         try:
+            # ical[0:1] / ical[5:7] raise IndexError on short input.
+            # int() raises ValueError on non-numeric slices or TypeError
+            # if ical is not a string/bytes.
+            # timedelta() constructor raises ValueError/OverflowError on
+            # out-of-range hours/minutes/seconds.
             sign, hours, minutes, seconds = (
                 ical[0:1],
                 int(ical[1:3]),
@@ -124,7 +129,7 @@ class vUTCOffset:
                 int(ical[5:7] or 0),
             )
             offset = timedelta(hours=hours, minutes=minutes, seconds=seconds)
-        except Exception as e:
+        except (ValueError, TypeError, IndexError, OverflowError) as e:
             raise ValueError(f"Expected UTC offset, got: {ical}") from e
         if not cls.ignore_exceptions and offset >= timedelta(hours=24):
             raise ValueError(f"Offset must be less than 24 hours, was {ical}")

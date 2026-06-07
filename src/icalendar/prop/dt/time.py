@@ -175,17 +175,21 @@ class vTime(TimeBase):
 
         try:
             if isinstance(ical, bytes):
+                # UnicodeDecodeError for non-decodable bytes
                 ical = ical.decode()
             utc = ical.endswith("Z")
             if utc:
                 ical = ical[:-1]
+            # int() raises ValueError for non-numeric slices
+            # or TypeError if ical is not a string/bytes
             timetuple = (int(ical[:2]), int(ical[2:4]), int(ical[4:6]))
             if tzinfo:
+                # time() constructor raises ValueError for out-of-range fields
                 return tzp.localize(time(*timetuple), tzinfo)
             if utc:
                 return tzp.localize_utc(time(*timetuple))
             return time(*timetuple)
-        except Exception as e:
+        except (UnicodeDecodeError, ValueError, TypeError) as e:
             raise ValueError(f"Expected time, got: {ical}") from e
 
     @classmethod

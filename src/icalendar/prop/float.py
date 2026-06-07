@@ -69,8 +69,10 @@ class vFloat(float):
     @classmethod
     def from_ical(cls, ical: str | float) -> Self:
         try:
+            # cls() is a float subclass; float() raises ValueError on
+            # non-numeric strings and TypeError on None/list/dict input.
             return cls(ical)
-        except Exception as e:
+        except (ValueError, TypeError) as e:
             raise ValueError(f"Expected float value, got: {ical}") from e
 
     @classmethod

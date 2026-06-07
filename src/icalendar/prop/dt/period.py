@@ -136,10 +136,13 @@ class vPeriod(TimeBase):
         from icalendar.prop.dt.types import vDDDTypes
 
         try:
+            # str.split() raises ValueError if ical has no '/' or too many
+            # '/'. vDDDTypes.from_ical raises ValueError/TypeError for
+            # malformed inner datetimes or durations.
             start, end_or_duration = ical.split("/")
             start = vDDDTypes.from_ical(start, timezone=timezone)
             end_or_duration = vDDDTypes.from_ical(end_or_duration, timezone=timezone)
-        except Exception as e:
+        except (ValueError, TypeError) as e:
             raise ValueError(f"Expected period format, got: {ical}") from e
         return (start, end_or_duration)
 

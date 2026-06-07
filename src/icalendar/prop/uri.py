@@ -76,9 +76,12 @@ class vUri(str):
     @classmethod
     def from_ical(cls, ical: str | bytes) -> Self:
         try:
+            # cls() is a str subclass; the bytes/str decode path raises
+            # UnicodeDecodeError for invalid bytes, and any future
+            # validation in __new__ could raise ValueError/TypeError.
             return cls(ical)
-        except Exception as e:
-            raise ValueError(f"Expected , got: {ical}") from e
+        except (ValueError, TypeError, UnicodeDecodeError) as e:
+            raise ValueError(f"Expected URI string, got: {ical!r}") from e
 
     @classmethod
     def examples(cls) -> list[Self]:

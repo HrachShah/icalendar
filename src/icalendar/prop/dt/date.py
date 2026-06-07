@@ -77,13 +77,18 @@ class vDate(TimeBase):
     @staticmethod
     def from_ical(ical):
         try:
+            # int() raises ValueError for non-numeric slices or
+            # TypeError if ical is not a string/bytes.
+            # date() constructor raises ValueError for out-of-range fields
+            # (e.g. month=13, day=31 of a 30-day month) and TypeError
+            # for wrong-arity tuples.
             timetuple = (
                 int(ical[:4]),  # year
                 int(ical[4:6]),  # month
                 int(ical[6:8]),  # day
             )
             return date(*timetuple)
-        except Exception as e:
+        except (ValueError, TypeError) as e:
             raise ValueError(f"Wrong date format {ical}") from e
 
     @classmethod

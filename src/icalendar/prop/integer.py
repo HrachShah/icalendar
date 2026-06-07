@@ -104,8 +104,12 @@ class vInt(int):
     @classmethod
     def from_ical(cls, ical: ICAL_TYPE):
         try:
+            # cls() is an int subclass; int() raises ValueError on
+            # non-numeric strings, TypeError on wrong-typed input
+            # (e.g. None, list, dict), and UnicodeDecodeError on
+            # non-decodable bytes.
             return cls(ical)
-        except Exception as e:
+        except (ValueError, TypeError, UnicodeDecodeError) as e:
             raise ValueError(f"Expected int, got: {ical}") from e
 
     @classmethod
