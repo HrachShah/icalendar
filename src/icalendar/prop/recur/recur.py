@@ -207,9 +207,7 @@ class vRecur(CaselessDict):
                     continue
                 recur[key] = cls.parse_type(key, vals)
             return cls(recur)
-        except ValueError:
-            raise
-        except Exception as e:
+        except (ValueError, TypeError, KeyError, AttributeError) as e:
             raise ValueError(f"Error in recurrence rule: {ical}") from e
 
     @classmethod
