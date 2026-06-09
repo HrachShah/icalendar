@@ -209,8 +209,8 @@ class vRecur(CaselessDict):
             return cls(recur)
         except ValueError:
             raise
-        except Exception as e:
-            raise ValueError(f"Error in recurrence rule: {ical}") from e
+        except (TypeError, AttributeError, KeyError) as e:
+            raise ValueError(f"Error in recurrence rule: {ical!r}") from e
 
     @classmethod
     def examples(cls) -> list[Self]:
