@@ -83,8 +83,8 @@ class vDate(TimeBase):
                 int(ical[6:8]),  # day
             )
             return date(*timetuple)
-        except Exception as e:
-            raise ValueError(f"Wrong date format {ical}") from e
+        except (ValueError, TypeError) as e:
+            raise ValueError(f"Wrong date format {ical!r}") from e
 
     @classmethod
     def examples(cls) -> list[Self]:

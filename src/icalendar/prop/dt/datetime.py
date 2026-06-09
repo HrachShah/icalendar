@@ -131,9 +131,9 @@ class vDatetime(TimeBase):
                 return datetime(*timetuple)
             if ical[15:16] == "Z":
                 return tzp.localize_utc(datetime(*timetuple))
-        except Exception as e:
-            raise ValueError(f"Wrong datetime format: {ical}") from e
-        raise ValueError(f"Wrong datetime format: {ical}")
+        except (ValueError, TypeError, AttributeError) as e:
+            raise ValueError(f"Wrong datetime format: {ical!r}") from e
+        raise ValueError(f"Wrong datetime format: {ical!r}")
 
     @classmethod
     def examples(cls) -> list[Self]:
