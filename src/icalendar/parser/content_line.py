@@ -257,7 +257,15 @@ class Contentlines(list[Contentline]):
             unfolded = UFOLD.sub("", st)
             lines = cls(Contentline(line) for line in NEWLINE.split(unfolded) if line)
             lines.append("")  # '\r\n' at the end of every content line
-        except Exception as e:
+        # The only failures that the protected block can actually raise:
+        #   - TypeError: st is None or not a str/bytes-like object that
+        #     to_unicode() can decode
+        #   - UnicodeDecodeError: st is bytes in an unsupported encoding
+        #   - ValueError: Contentline(line) raised on a malformed line
+        # A bare `except Exception:` was also catching AttributeError from
+        # typos in our own code and any other unexpected exception, which
+        # is the kind of bug we want to surface rather than swallow.
+        except (TypeError, UnicodeDecodeError, ValueError) as e:
             raise ValueError("Expected StringType with content lines") from e
         return lines
 
