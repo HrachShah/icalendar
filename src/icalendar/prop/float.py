@@ -70,8 +70,13 @@ class vFloat(float):
     def from_ical(cls, ical: str | float) -> Self:
         try:
             return cls(ical)
-        except Exception as e:
-            raise ValueError(f"Expected float value, got: {ical}") from e
+        except (ValueError, TypeError) as e:
+            # float() raises ValueError for unparseable strings
+            # ('abc', '', '1.5e'), and TypeError for non-numeric
+            # types (None, list, dict, complex). float() does NOT
+            # raise for inf/-inf/nan or 1e1000 overflow (those
+            # produce inf or -inf silently), so no OverflowError.
+            raise ValueError(f"Expected float value, got: {ical!r}") from e
 
     @classmethod
     def examples(cls) -> list[Self]:

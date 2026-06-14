@@ -105,8 +105,12 @@ class vInt(int):
     def from_ical(cls, ical: ICAL_TYPE):
         try:
             return cls(ical)
-        except Exception as e:
-            raise ValueError(f"Expected int, got: {ical}") from e
+        except (ValueError, TypeError, OverflowError) as e:
+            # int() raises ValueError for unparseable strings
+            # ('abc', '1.5', '', '1+1'), TypeError for non-numeric
+            # types (None, list, dict, complex), and OverflowError
+            # for infinite floats (float('inf'), float('-inf')).
+            raise ValueError(f"Expected int, got: {ical!r}") from e
 
     @classmethod
     def examples(cls) -> list[Self]:
