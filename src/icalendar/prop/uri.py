@@ -65,6 +65,10 @@ class vUri(str):
         /,
         params: dict[str, Any] | None = None,
     ) -> Self:
+        if not isinstance(value, (str, bytes)):
+            raise TypeError(
+                f"expected str or bytes for vUri, got {type(value).__name__}"
+            )
         value = to_unicode(value, encoding=encoding)
         self = super().__new__(cls, value)
         self.params = Parameters(params)
@@ -77,8 +81,8 @@ class vUri(str):
     def from_ical(cls, ical: str | bytes) -> Self:
         try:
             return cls(ical)
-        except Exception as e:
-            raise ValueError(f"Expected , got: {ical}") from e
+        except (TypeError, ValueError, UnicodeDecodeError) as e:
+            raise ValueError(f"Expected URI string, got: {ical!r}") from e
 
     @classmethod
     def examples(cls) -> list[Self]:

@@ -2,6 +2,7 @@ import unittest
 from datetime import date, datetime, time, timedelta
 
 from icalendar.parser import Parameters
+import pytest
 
 
 class TestProp(unittest.TestCase):
@@ -244,6 +245,22 @@ class TestProp(unittest.TestCase):
 
         assert vUri("http://www.example.com/").to_ical() == b"http://www.example.com/"
         assert vUri.from_ical("http://www.example.com/") == "http://www.example.com/"
+
+    def test_prop_vUri_rejects_non_string_input(self):
+        """vUri must reject non-str/bytes inputs instead of silently accepting them.
+
+        A None/dict/list/lint value used to be passed through to_unicode() unchanged
+        and returned as vUri(repr(input)) with no error. The bare 'except Exception'
+        in from_ical could not catch this because no exception was raised. The fix
+        adds an isinstance check in __new__ and narrows the except in from_ical.
+        """
+        from icalendar.prop import vUri
+
+        for bad in (None, 123, [], {"u": "v"}):
+            with pytest.raises(TypeError):
+                vUri(bad)
+            with pytest.raises(ValueError):
+                vUri.from_ical(bad)
 
     def test_prop_vGeo(self):
         from icalendar.prop import vGeo
