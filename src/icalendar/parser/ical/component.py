@@ -124,7 +124,23 @@ class ComponentIcalParser:
         else:
             self._stack[-1].add_component(component)
         if vals.upper() == "VTIMEZONE" and "TZID" in component:
-            tzp.cache_timezone_component(component)
+            # cache_timezone_component -> to_tz -> create_timezone ->
+            # dateutil.tz.tzical(file).get() (zoneinfo._create_timezone) which
+            # requires at least one STANDARD or DAYLIGHT subcomponent. A
+            # VTIMEZONE that has a TZID but no usable subcomponents (because
+            # the calendar omitted them, or they failed to parse under
+            # ignore_exceptions mode) raises ValueError from inside
+            # dateutil, which previously crashed the entire from_ical call
+            # even though the broken VTIMEZONE itself is just an unused
+            # cache entry. Catch the real failure modes and record the
+            # error on the component so the broken VTIMEZONE is still
+            # preserved verbatim in the parsed tree.
+            try:
+                tzp.cache_timezone_component(component)
+            except (ValueError, KeyError, TypeError, OSError) as exc:
+                component.errors.append(
+                    (None, f"Failed to cache VTIMEZONE for caching: {exc}")
+                )
 
     def prepare_components(self) -> None:
         """Prepare the parsed components.

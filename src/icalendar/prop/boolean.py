@@ -78,8 +78,15 @@ class vBoolean(int):
     def from_ical(cls, ical: str) -> bool:
         try:
             return cls.BOOL_MAP[ical]
-        except Exception as e:
-            raise ValueError(f"Expected 'TRUE' or 'FALSE'. Got {ical}") from e
+        except (KeyError, AttributeError) as e:
+            # CaselessDict.__getitem__ does `to_unicode(key).upper()`:
+            # KeyError for any string that isn't 'true'/'false' (case
+            # insensitive), and AttributeError for any input that
+            # doesn't have an .upper() method (None, int, float, list,
+            # dict, True/False bools, etc.). to_unicode on non-str/non-
+            # bytes returns the value unchanged, so .upper() is what
+            # actually raises.
+            raise ValueError(f"Expected 'TRUE' or 'FALSE'. Got {ical!r}") from e
 
     @classmethod
     def examples(cls) -> list[Self]:

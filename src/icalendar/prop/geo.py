@@ -100,7 +100,17 @@ class vGeo:
         try:
             latitude, longitude = ical.split(";")
             return (float(latitude), float(longitude))
-        except Exception as e:
+        except (ValueError, TypeError, AttributeError) as e:
+            # ical.split(";") raises AttributeError if ical is None
+            # (or any non-string), and ValueError on a 0-element or
+            # >2-element split. float() raises ValueError on a
+            # non-numeric substring and OverflowError on a value
+            # outside the IEEE-754 range. The previous bare
+            # `except Exception` was also catching AttributeError from
+            # a typo in this method, and silently converting a
+            # MemoryError or RecursionError on a custom float-like
+            # object into a friendly 'Expected 'float;float' ' message
+            # that hides the real traceback.
             raise ValueError(f"Expected 'float;float' , got: {ical}") from e
 
     def __eq__(self, other: object) -> bool:
