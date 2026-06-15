@@ -66,6 +66,10 @@ class vCalAddress(str):
         /,
         params: dict[str, Any] | None = None,
     ) -> Self:
+        if not isinstance(value, (str, bytes)):
+            raise TypeError(
+                f"expected str or bytes for vCalAddress, got {type(value).__name__}"
+            )
         value = to_unicode(value, encoding=encoding)
         self = super().__new__(cls, value)
         self.params = Parameters(params)
@@ -79,7 +83,10 @@ class vCalAddress(str):
 
     @classmethod
     def from_ical(cls, ical: str | bytes) -> Self:
-        return cls(ical)
+        try:
+            return cls(ical)
+        except (TypeError, ValueError, UnicodeDecodeError) as e:
+            raise ValueError(f"Expected CAL-ADDRESS string, got: {ical!r}") from e
 
     @property
     def ical_value(self) -> str:

@@ -262,6 +262,30 @@ class TestProp(unittest.TestCase):
             with pytest.raises(ValueError):
                 vUri.from_ical(bad)
 
+    def test_prop_vCalAddress_rejects_non_string_input(self):
+        """vCalAddress must reject non-str/bytes inputs instead of silently accepting them.
+
+        The previous __new__ passed any value through to_unicode() and used the result
+        unchanged, so vCalAddress(None) silently became vCalAddress('None') and
+        vCalAddress({'k': 'v'}) became vCalAddress('{'k': 'v'}'). from_ical's
+        cls(ical) call raised nothing in the bad case, so callers had no way to
+        detect the corruption. The fix adds an isinstance check in __new__ and
+        narrows the except in from_ical to the exceptions the inner operations
+        actually raise (TypeError, ValueError, UnicodeDecodeError).
+        """
+        from icalendar.prop import vCalAddress
+
+        # Round-trip: str and bytes are still accepted
+        assert str(vCalAddress("mailto:test@example.com")) == "mailto:test@example.com"
+        assert str(vCalAddress(b"mailto:test@example.com")) == "mailto:test@example.com"
+
+        # Bad inputs are rejected with the right exception type
+        for bad in (None, 123, [], {"k": "v"}):
+            with pytest.raises(TypeError):
+                vCalAddress(bad)
+            with pytest.raises(ValueError):
+                vCalAddress.from_ical(bad)
+
     def test_prop_vGeo(self):
         from icalendar.prop import vGeo
 
