@@ -209,7 +209,27 @@ class vRecur(CaselessDict):
             return cls(recur)
         except ValueError:
             raise
-        except Exception as e:
+        except (TypeError, KeyError, AttributeError) as e:
+            # The two inner try/except blocks already handle
+            # ValueError (bad split / bad from_ical input), and
+            # ValueError is re-raised unchanged so callers can
+            # distinguish 'bad recurrence rule' from 'unparseable
+            # component value' (the latter is the case for parser
+            # failures in vInt / vFrequency / vWeekday / vDDDTypes).
+            # The remaining failure modes are:
+            #   - TypeError: ical is not a string-like (None, bytes,
+            #     list) so ical.split raises TypeError, or
+            #     cls.parse_type called on a non-string key/vals.
+            #   - KeyError: cls.types[key] is missing for a custom
+            #     or unknown recurrence key (the cls.types.get falls
+            #     back to vText, but a future types entry could
+            #     regress that with a typo).
+            #   - AttributeError: a typo on a name in this method or
+            #     in one of the from_ical helpers called below.
+            # Catching the bare Exception was silently converting
+            # MemoryError, RecursionError, and import-time errors
+            # inside the parser into a friendly 'Error in recurrence
+            # rule' that hides the real traceback.
             raise ValueError(f"Error in recurrence rule: {ical}") from e
 
     @classmethod
