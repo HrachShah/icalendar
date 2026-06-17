@@ -2,7 +2,7 @@ import unittest
 from datetime import datetime
 from zoneinfo import ZoneInfo
 
-from icalendar import Calendar, cli
+from icalendar import Calendar, cli, vCalAddress
 
 INPUT = """
 BEGIN:VCALENDAR
@@ -102,6 +102,27 @@ class CLIToolTest(unittest.TestCase):
         for event in calendar.walk("vevent"):
             output += cli.view(event) + "\n\n"
         assert output == PROPER_OUTPUT
+
+
+class FormatNameTest(unittest.TestCase):
+    """Tests for :func:`cli._format_name` covering CN param and string inputs."""
+
+    def test_vcaladdress_with_cn_uses_cn(self):
+        addr = vCalAddress("mailto:jane@example.com", params={"CN": "Jane Doe"})
+        assert cli._format_name(addr) == "Jane Doe <jane@example.com>"
+
+    def test_vcaladdress_without_cn_falls_back_to_localpart(self):
+        addr = vCalAddress("mailto:bob@example.com")
+        assert cli._format_name(addr) == "bob <bob@example.com>"
+
+    def test_plain_string_with_mailto_prefix_strips_prefix(self):
+        assert cli._format_name("mailto:carol@example.com") == "carol <carol@example.com>"
+
+    def test_plain_string_without_mailto_prefix_keeps_email(self):
+        assert cli._format_name("dave@example.com") == "dave <dave@example.com>"
+
+    def test_empty_string_returns_empty(self):
+        assert cli._format_name("") == ""
 
 
 if __name__ == "__main__":
