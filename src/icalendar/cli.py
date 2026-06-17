@@ -11,18 +11,35 @@ from icalendar.cal.calendar import Calendar
 from icalendar.cal.event import Event
 
 
-def _format_name(address: str) -> str:
-    """Format a display name and email from an address string.
+def _format_name(address) -> str:
+    """Format a display name and email from an address.
+
+    Accepts either a plain ``mailto:``/bare email string or a
+    :class:`vCalAddress`. When the address carries a ``CN`` (common name)
+    parameter, that human-readable name is used; otherwise the local-part
+    of the email is used as a fallback. A leading ``mailto:`` is stripped
+    from the rendered email.
 
     Parameters:
-        address: An address object, such as mailto:name@example.com.
+        address: A ``vCalAddress`` or an email string, such as
+            ``mailto:name@example.com``.
 
     Returns:
-        A formatted string, like 'name <name@example.com>',
-        or an empty string if no email is found.
+        A formatted string, like ``Jane Doe <jane@example.com>``, or an
+        empty string if no email is found.
     """
-    email = address.rsplit(":", maxsplit=1)[-1]
-    name = email.split("@")[0]
+    if isinstance(address, vCalAddress):
+        email = address.email
+        name = (address.params.get("CN") or email.split("@", 1)[0]).strip()
+    else:
+        raw = str(address)
+        if not raw:
+            return ""
+        if raw.lower().startswith("mailto:"):
+            email = raw[7:]
+        else:
+            email = raw
+        name = email.split("@", 1)[0] or email
     if not email:
         return ""
     return f"{name} <{email}>"
