@@ -48,8 +48,8 @@ class vFrequency(str):
     def from_ical(cls, ical):
         try:
             return cls(ical.upper())
-        except Exception as e:
-            raise ValueError(f"Expected frequency, got: {ical}") from e
+        except (ValueError, AttributeError) as e:
+            raise ValueError(f"Expected frequency, got: {ical!r}") from e
 
     @classmethod
     def parse_jcal_value(cls, value: Any) -> Self:
