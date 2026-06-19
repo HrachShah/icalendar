@@ -22,6 +22,13 @@ def test_error():
         vBoolean.from_ical("ture")
 
 
+def test_error_message_includes_value():
+    """The ValueError message should include the bad value."""
+    with pytest.raises(ValueError) as excinfo:
+        vBoolean.from_ical("ture")
+    assert "ture" in str(excinfo.value)
+
+
 def test_ical_value():
     """ical_value property returns the boolean value."""
     assert vBoolean(True).ical_value is True
