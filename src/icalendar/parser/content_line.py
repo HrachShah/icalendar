@@ -257,8 +257,10 @@ class Contentlines(list[Contentline]):
             unfolded = UFOLD.sub("", st)
             lines = cls(Contentline(line) for line in NEWLINE.split(unfolded) if line)
             lines.append("")  # '\r\n' at the end of every content line
-        except Exception as e:
-            raise ValueError("Expected StringType with content lines") from e
+        except (ValueError, TypeError) as e:
+            raise ValueError(
+                f"Expected string with content lines, got {st!r}"
+            ) from e
         return lines
 
 
