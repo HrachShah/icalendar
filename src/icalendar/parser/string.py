@@ -263,10 +263,10 @@ def _unescape_string(val: str) -> str:
         - ``%5C`` -> ``\``
     """
     return (
-        val.replace("%2C", ",")
+        val.replace("%5C", "\\")
+        .replace("%2C", ",")
         .replace("%3A", ":")
         .replace("%3B", ";")
-        .replace("%5C", "\\")
     )
 
 
