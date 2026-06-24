@@ -103,6 +103,10 @@ class vInt(int):
 
     @classmethod
     def from_ical(cls, ical: ICAL_TYPE):
+        # Reject floats up front: int(1.5) silently truncates to 1, and
+        # int(3.0) is 3, but we want to reject 3.0.
+        if isinstance(ical, float):
+            raise ValueError(f"Expected int, got: {ical}")
         try:
             return cls(ical)
         except Exception as e:
