@@ -1,0 +1,1 @@
+Fold a content line one character earlier when the default fold boundary would otherwise land between the backslash and the escaped character of a TEXT escape sequence (``\``, ``\n``, ``\N``, ``\;``, ``\,``), so the escape survives the round-trip and stays readable to lenient downstream parsers (e.g. Google Calendar). :issue:`1501`
