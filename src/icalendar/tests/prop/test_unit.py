@@ -190,6 +190,60 @@ class TestProp(unittest.TestCase):
         r = vRecur.from_ical("FREQ=MONTHLY;BYOTHER=TEXT;BYEASTER=-3")
         assert vRecur(r).to_ical() == b"FREQ=MONTHLY;BYEASTER=-3;BYOTHER=TEXT"
 
+    def test_prop_vRecur_strips_whitespace(self):
+        """vRecur.from_ical must tolerate optional whitespace (spaces and tabs)
+        on either side of the ``=`` separator in each ``key=value`` part.
+
+        The RRULE grammar in RFC 5545 does not permit whitespace around ``=``
+        or ``;``, but real-world iCalendar files produced by editors that
+        serialise a structured recurrence as a UI form often emit
+        ``FREQ = DAILY ; COUNT = 10`` (with spaces around every delimiter).
+        Before the fix, the space-suffixed key ``FREQ `` was stored as a
+        distinct key in the underlying CaselessDict, so:
+
+        - ``rrule['FREQ']`` raised ``KeyError`` even though the rule was
+          visually well-formed.
+        - A round-trip through ``to_ical()`` rewrote the value as
+          ``FREQ =DAILY`` (or similar), so re-parsing the output would fail.
+        - For ``FREQ= DAILY`` the trailing-space value ``" DAILY"`` was
+          passed to ``vFrequency.from_ical`` which rejected it with
+          ``ValueError: Expected frequency, got:  DAILY`` deep inside the
+          parser, far from the original whitespace mistake.
+        """
+        from icalendar.prop import vRecur
+
+        # No whitespace - the existing happy path still works
+        r = vRecur.from_ical("FREQ=DAILY;COUNT=10")
+        assert r == {"FREQ": ["DAILY"], "COUNT": [10]}
+        assert vRecur(r).to_ical() == b"FREQ=DAILY;COUNT=10"
+
+        # Space before ``=`` (key with trailing space)
+        r = vRecur.from_ical("FREQ =DAILY;COUNT=10")
+        assert r == {"FREQ": ["DAILY"], "COUNT": [10]}
+        # The key was previously stored as 'FREQ ' and lookup by 'FREQ'
+        # returned KeyError. With stripping, both 'FREQ' and 'FREQ ' map
+        # to the same entry.
+        assert "FREQ" in r
+        assert r["FREQ"] == ["DAILY"]
+        # Round-trip emits the canonical, whitespace-free form
+        assert vRecur(r).to_ical() == b"FREQ=DAILY;COUNT=10"
+
+        # Space after ``=`` (value with leading space)
+        # Pre-fix this raised ValueError inside vFrequency.from_ical
+        r = vRecur.from_ical("FREQ= DAILY;COUNT=10")
+        assert r == {"FREQ": ["DAILY"], "COUNT": [10]}
+        assert vRecur(r).to_ical() == b"FREQ=DAILY;COUNT=10"
+
+        # Space on both sides
+        r = vRecur.from_ical("FREQ = DAILY ; COUNT = 10")
+        assert r == {"FREQ": ["DAILY"], "COUNT": [10]}
+        assert vRecur(r).to_ical() == b"FREQ=DAILY;COUNT=10"
+
+        # Tab characters count as whitespace too
+        r = vRecur.from_ical("FREQ\t=DAILY;COUNT=\t10")
+        assert r == {"FREQ": ["DAILY"], "COUNT": [10]}
+
+
     def test_prop_vText(self):
         from icalendar.parser import Contentline
         from icalendar.prop import vText

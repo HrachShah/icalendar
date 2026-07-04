@@ -46,6 +46,7 @@ Bug fixes
 - Fixed :func:`~icalendar.attr.get_end_property` to avoid allowing the creation of VEVENT components with negative durations. Only VTODO components are allowed to have negative durations. :issue:`999`
 - GitHub Actions: conditional tests now show as "skipped" instead of "pending". :issue:`1264`
 - Fixed ``Component.__eq__`` method not being commutative when comparing subcomponents. :issue:`1224`
+- :class:`~icalendar.prop.vRecur.vRecur` ``from_ical`` now strips optional ASCII whitespace on either side of the ``=`` separator in each ``key=value`` part of the RECUR value, so a recurrence like ``FREQ= DAILY ; COUNT = 10`` is accepted and round-trips as ``FREQ=DAILY;COUNT=10`` instead of storing a space-suffixed key (which broke ``rrule["FREQ"]`` lookups) or surfacing a confusing ``ValueError: Expected frequency, got:  DAILY`` from deep inside the parser. :issue:`351`
 
 Documentation
 ~~~~~~~~~~~~~
