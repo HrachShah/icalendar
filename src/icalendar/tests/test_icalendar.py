@@ -42,6 +42,14 @@ class IcalendarTestCase(unittest.TestCase):
             "A faked\r\n  long line\r\nAnd another lin\r\n\te that is folded\r\n"
         ) == ["A faked long line", "And another line that is folded", ""]
 
+    def test_from_ical_non_str_input_wraps_in_value_error(self):
+        with pytest.raises(ValueError, match="Expected StringType with content lines"):
+            Contentlines.from_ical(None)
+        with pytest.raises(ValueError, match="Expected StringType with content lines"):
+            Contentlines.from_ical(123)
+        with pytest.raises(ValueError, match="Expected StringType with content lines"):
+            Contentlines.from_ical([b"x"])
+
     def test_contentline_class(self):
         assert (
             Contentline("Si meliora dies, ut vina, poemata reddit").to_ical()
