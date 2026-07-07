@@ -98,12 +98,64 @@ class CaselessDict(OrderedDict):
                 >>> "summary" in d
                 True
         """
+        # Materialize all args first: 1) avoids consuming one-shot iterators
+        # (generators) by the pre-init validation below, and 2) lets us
+        # validate every key without needing to reason about whether the
+        # caller passed a dict, an iterable of pairs, or a kwargs mapping.
+        # Without this, a generator passed by the icalendar parser is
+        # exhausted here and super().__init__() sees no data at all.
+        if args:
+            new_args: tuple = (
+                {k: v for k, v in arg.items()}
+                if hasattr(arg, "items")
+                else list(arg)
+                for arg in args
+            )
+            args = tuple(new_args)
+        # Validate keys first so a non-str/bytes key raises a clear
+        # TypeError at the call site instead of an opaque AttributeError
+        # from .upper() inside __setitem__.
+        for arg in args:
+            if hasattr(arg, "items"):
+                for k in arg:
+                    if not isinstance(k, (str, bytes)):
+                        raise TypeError(
+                            f"CaselessDict keys must be str or bytes, got "
+                            f"{type(k).__name__}: {k!r}"
+                        )
+            elif hasattr(arg, "__iter__"):
+                for entry in arg:
+                    if isinstance(entry, tuple) and len(entry) >= 1:
+                        k = entry[0]
+                        if not isinstance(k, (str, bytes)):
+                            raise TypeError(
+                                f"CaselessDict keys must be str or bytes, got "
+                                f"{type(k).__name__}: {k!r}"
+                            )
+        for k in kwargs:
+            if not isinstance(k, (str, bytes)):
+                raise TypeError(
+                    f"CaselessDict keys must be str or bytes, got "
+                    f"{type(k).__name__}: {k!r}"
+                )
         super().__init__(*args, **kwargs)
-        for key, value in self.items():
+        # Normalize keys to uppercase. Each key must be a str or bytes (the
+        # documented contract); anything else used to crash deep inside
+        # ``to_unicode(key).upper()`` with an opaque
+        # ``AttributeError: 'int' object has no attribute 'upper'``. Surface
+        # a clear, immediate ``TypeError`` at the call site instead so the
+        # caller knows the exact offending key and its type.
+        for key in list(self.keys()):
+            if not isinstance(key, (str, bytes)):
+                raise TypeError(
+                    f"CaselessDict keys must be str or bytes, got "
+                    f"{type(key).__name__}: {key!r}"
+                )
+            value = self[key]
             key_upper = to_unicode(key).upper()
             if key != key_upper:
                 super().__delitem__(key)
-                self[key_upper] = value
+                super().__setitem__(key_upper, value)
 
     __hash__ = None
 

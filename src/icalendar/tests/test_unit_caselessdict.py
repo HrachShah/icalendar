@@ -148,3 +148,67 @@ class TestCaselessdict(unittest.TestCase):
         # Should still work correctly with dicts
         assert d == {"TEST": 1}
         assert d != {"TEST": 2}
+    def test_non_string_key_raises_clean_typeerror(self) -> None:
+        """CaselessDict keys must be str or bytes. A non-string key used to
+        crash deep inside ``to_unicode(key).upper()`` with an opaque
+        ``AttributeError: 'int' object has no attribute 'upper'``. The fix
+        surfaces a clear ``TypeError`` naming the offending key and its
+        type at the call site instead.
+
+        Only hashable non-str/bytes values are tested here: an unhashable
+        key like ``[1]`` is already rejected by ``dict()`` with a clear
+        ``TypeError: unhashable type: 'list'`` and never reaches the
+        CaselessDict-specific validation path.
+        """
+        CaselessDict = icalendar.caselessdict.CaselessDict
+        for bad in (1, 1.5, None, object(), True, frozenset()):
+            with self.assertRaises(TypeError) as ctx:
+                CaselessDict({bad: "value"})
+            msg = str(ctx.exception)
+            assert "str or bytes" in msg, msg
+            assert type(bad).__name__ in msg, msg
+
+    def test_bytes_key_is_accepted(self) -> None:
+        """Bytes keys are part of the documented contract and must continue
+        to be accepted (used internally for cases like encoded property
+        names coming from a binary source).
+        """
+        CaselessDict = icalendar.caselessdict.CaselessDict
+        d = CaselessDict({b"summary": "Meeting"})
+        assert d["SUMMARY"] == "Meeting"
+        assert d["summary"] == "Meeting"
+
+    def test_mixed_case_string_keys_normalized_at_construction(self) -> None:
+        """The existing upper-case normalization must still run; the new
+        type check is additive and must not break the documented contract
+        of treating ``CaselessDict({"summary": 1, "SUMMARY": 2})`` as a
+        single ``SUMMARY -> 2`` entry (last-wins, which is the same rule
+        the upstream dict already applies to identical keys).
+        """
+        CaselessDict = icalendar.caselessdict.CaselessDict
+        d = CaselessDict({"summary": 1, "SUMMARY": 2})
+        assert list(d.keys()) == ["SUMMARY"]
+        assert d["SUMMARY"] == 2
+
+    def test_generator_arg_not_exhausted_by_init(self) -> None:
+        """CaselessDict.__init__ must materialise a generator-style iterable
+        before validating keys. The icalendar parser passes
+        ``Parameters(...)`` with a generator of (key, value) pairs from
+        ``Contentline.parts()``; if the validation loop iterates the
+        generator, the subsequent ``super().__init__(*args, **kwargs)``
+        receives an exhausted generator and the dict comes out empty.
+        A previous version of this fix consumed the generator and
+        silently dropped every parameter, which broke RDATE/TZID
+        round-trips on real calendars.
+        """
+        CaselessDict = icalendar.caselessdict.CaselessDict
+        # Mimic the generator the icalendar parser passes: an iterator
+        # of (key, value) pairs that is consumed by ``dict()`` and that
+        # ``CaselessDict`` must NOT touch until it is passed to
+        # ``super().__init__``.
+        def gen():
+            yield ("key1", "val1")
+            yield ("key2", "val2")
+        d = CaselessDict(gen())
+        assert d["KEY1"] == "val1"
+        assert d["KEY2"] == "val2"
