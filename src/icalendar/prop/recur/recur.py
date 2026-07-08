@@ -205,7 +205,7 @@ class vRecur(CaselessDict):
                     # E.g. incorrect trailing semicolon, like (issue #157):
                     # FREQ=YEARLY;BYMONTH=11;BYDAY=1SU;
                     continue
-                recur[key] = cls.parse_type(key, vals)
+                recur[key.strip()] = cls.parse_type(key.strip(), vals.strip())
             return cls(recur)
         except ValueError:
             raise

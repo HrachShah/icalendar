@@ -128,3 +128,22 @@ def test_byday_to_ical(freq, byday, dtstart, expected):
     event.add("DTSTART", dtstart)
     event.add("RRULE", {"FREQ": [freq], "BYDAY": byday})
     assert event.to_ical() == expected
+
+def test_vrecur_from_ical_strips_whitespace_around_keys_and_values():
+    """vRecur.from_ical tolerates the optional whitespace between
+    RRULE parts that RFC 5545 allows. Without the strip(), keys
+    like 'FREQ ' (with trailing space) used to be stored as 'FREQ '
+    and then never match a lookup by 'FREQ'. Likewise ' COUNT=10'
+    (leading space) used to be stored as ' COUNT' with the
+    leading space, so a lookup by 'COUNT' would miss it.
+    """
+    from icalendar.prop.recur.recur import vRecur
+    r = vRecur.from_ical("FREQ=DAILY ; COUNT=10")
+    assert "FREQ" in r, f"expected key 'FREQ' in {dict(r)!r}"
+    assert "COUNT" in r, f"expected key 'COUNT' in {dict(r)!r}"
+    assert r["FREQ"] == ["DAILY"]
+    assert r["COUNT"] == [10]
+    # Leading and trailing whitespace on the whole value string is also stripped
+    r2 = vRecur.from_ical("FREQ=DAILY;COUNT= 5 ")
+    assert r2["COUNT"] == [5]
+
