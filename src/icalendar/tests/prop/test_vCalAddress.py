@@ -1,3 +1,5 @@
+import pytest
+
 from icalendar.parser import Parameters
 from icalendar.prop import vCalAddress
 
@@ -55,3 +57,24 @@ def test_set_the_name():
     address.name = "Yemaya :)"
     assert address.name == "Yemaya :)"
     assert address.params["CN"] == "Yemaya :)"
+
+
+def test_from_ical_validation():
+    with pytest.raises(ValueError) as exc_info:
+        vCalAddress.from_ical(1)
+    assert "int" in str(exc_info.value)
+
+    with pytest.raises(ValueError) as exc_info:
+        vCalAddress.from_ical(None)
+    assert "None" in str(exc_info.value)
+
+    with pytest.raises(ValueError) as exc_info:
+        vCalAddress.from_ical([])
+    assert "list" in str(exc_info.value)
+
+    with pytest.raises(ValueError) as exc_info:
+        vCalAddress.from_ical({})
+    assert "dict" in str(exc_info.value)
+
+    assert vCalAddress.from_ical("MAILTO:maxm@mxm.dk") == "MAILTO:maxm@mxm.dk"
+    assert vCalAddress.from_ical(b"MAILTO:maxm@mxm.dk") == "MAILTO:maxm@mxm.dk"

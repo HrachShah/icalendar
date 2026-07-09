@@ -79,6 +79,11 @@ class vCalAddress(str):
 
     @classmethod
     def from_ical(cls, ical: str | bytes) -> Self:
+        if not isinstance(ical, (str, bytes)):
+            raise ValueError(
+                f"Expected str or bytes for CAL-ADDRESS, got {type(ical).__name__}: "
+                f"{ical!r}"
+            )
         return cls(ical)
 
     @property
