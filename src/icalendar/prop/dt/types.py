@@ -87,6 +87,13 @@ class vDDDTypes(TimeBase):
     def from_ical(cls, ical, timezone=None):
         if isinstance(ical, cls):
             return ical.dt
+        if not isinstance(ical, (str, bytes)):
+            raise ValueError(
+                f"Expected datetime, date, time, or period. Got {type(ical).__name__}: "
+                f"{ical!r}"
+            )
+        if isinstance(ical, bytes):
+            ical = ical.decode("utf-8")
         u = ical.upper()
         if u.startswith(("P", "-P", "+P")):
             return vDuration.from_ical(ical)
