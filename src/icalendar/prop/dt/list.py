@@ -42,6 +42,11 @@ class vDDDLists:
 
     @staticmethod
     def from_ical(ical, timezone=None):
+        if not isinstance(ical, (str, bytes)):
+            raise ValueError(
+                f"Expected str or bytes for date-time-list, got "
+                f"{type(ical).__name__}: {ical!r}"
+            )
         out = []
         ical_dates = ical.split(",")
         for ical_dt in ical_dates:
