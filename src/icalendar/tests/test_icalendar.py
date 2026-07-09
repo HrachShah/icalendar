@@ -253,10 +253,9 @@ class IcalendarTestCase(unittest.TestCase):
             "Vestibulum conval\r\n lis imperdiet dui posuere."
         )
 
-        # I don't really get this test
-        # at least just but bytes in there
-        # porting it to "run" under python 2 & 3 makes it not much better
-        with pytest.raises(AssertionError):
+        # foldline is a str-only API; passing bytes raises TypeError (not AssertionError),
+        # so the caller's mistake surfaces immediately and is not stripped by `python -O`.
+        with pytest.raises(TypeError):
             foldline("привет".encode(), limit=3)
 
         assert foldline("foobar", limit=4) == "foo\r\n bar"

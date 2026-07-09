@@ -30,8 +30,9 @@ def _escape_char(text: str | bytes) -> str | bytes:
         6. ``"\n"`` -> ``r"\n"`` (transform a newline character to a literal, or raw,
            newline character)
     """
-    assert isinstance(text, (str, bytes))
     # NOTE: ORDER MATTERS!
+    if not isinstance(text, (str, bytes)):
+        raise TypeError(f"text must be str or bytes, not {type(text).__name__}")
     return (
         text.replace(r"\N", "\n")
         .replace("\\", "\\\\")
@@ -102,7 +103,8 @@ def _unescape_char(text: str | bytes) -> str | bytes | None:
         5. ``\;`` -> ``;`` (unescape semicolons)
         6. ``\\`` -> ``\`` (unescape backslashes last)
     """
-    assert isinstance(text, (str, bytes))
+    if not isinstance(text, (str, bytes)):
+        raise TypeError(f"text must be str or bytes, not {type(text).__name__}")
     # NOTE: ORDER MATTERS!
     if isinstance(text, str):
         return (
@@ -170,8 +172,10 @@ def foldline(line: str, limit: int = 75, fold_sep: str = "\r\n ") -> str:
     immediately followed by a single linear white-space character (i.e.,
     SPACE or HTAB).
     """
-    assert isinstance(line, str)
-    assert "\n" not in line
+    if not isinstance(line, str):
+        raise TypeError(f"line must be str, not {type(line).__name__}")
+    if "\n" in line:
+        raise ValueError("line must not contain newline characters")
 
     # Use a fast and simple variant for the common case that line is all ASCII.
     try:

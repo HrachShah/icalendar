@@ -10,6 +10,7 @@ from icalendar.cal.calendar import Calendar
 from icalendar.cal.component_factory import ComponentFactory
 from icalendar.cal.event import Event
 from icalendar.parser import Contentline, Parameters, _unescape_char
+from icalendar.parser import escape_char, foldline, unescape_char
 
 
 @pytest.mark.parametrize(
@@ -237,6 +238,36 @@ def test_escaped_characters_read(event_name, expected_cn, expected_ics, events):
 def test_unescape_char():
     assert _unescape_char(b"123") == b"123"
     assert _unescape_char(b"\\n") == b"\n"
+
+
+def test_unescape_char_rejects_non_string_non_bytes():
+    """Passing a non-str/bytes value to _unescape_char raises TypeError
+    (and would have been stripped by `python -O` under the old assert-based guard)."""
+    for bad in (None, 42, 3.14, ["a", "b"], {"x": 1}, object()):
+        with pytest.raises(TypeError, match="text must be str or bytes"):
+            _unescape_char(bad)
+        # the deprecated public wrapper forwards the same error.
+        with pytest.raises(TypeError, match="text must be str or bytes"):
+            unescape_char(bad)
+
+
+def test_escape_char_rejects_non_string_non_bytes():
+    """Same TypeError contract on the escape side; covers the public deprecated alias too."""
+    for bad in (None, 42, 3.14, ["a"], {"x": 1}):
+        with pytest.raises(TypeError, match="text must be str or bytes"):
+            escape_char(bad)
+
+
+def test_foldline_rejects_bytes_and_newlines():
+    """foldline is a str-only API; non-str input and embedded newlines now raise
+    proper exceptions instead of being swallowed by stripped asserts."""
+    for bad in (b"foo", None, 42, ["a"], {"x": 1}):
+        with pytest.raises(TypeError, match="line must be str"):
+            foldline(bad)
+    with pytest.raises(ValueError, match="line must not contain newline"):
+        foldline("foo\nbar")
+    with pytest.raises(ValueError, match="line must not contain newline"):
+        foldline("foo\r\nbar")
 
 
 def test_split_on_unescaped_comma():
