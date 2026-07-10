@@ -270,6 +270,26 @@ def test_foldline_rejects_bytes_and_newlines():
         foldline("foo\r\nbar")
 
 
+def test_contentline_rejects_unescaped_newline():
+    """Contentline() used to `assert "\n" not in value` - that check is
+    stripped under `python -O` and would let a malformed multi-line value
+    through. Now it raises ValueError naming the failure mode."""
+    with pytest.raises(ValueError, match="unescaped new line"):
+        Contentline("SUMMARY:hello\nworld")
+    with pytest.raises(ValueError, match="unescaped new line"):
+        Contentline("SUMMARY:hello\r\nworld")
+
+
+def test_contentline_from_parts_rejects_non_parameters():
+    """Contentline.from_parts() used to `assert isinstance(params, Parameters)`
+    which is also stripped under `python -O`. The new TypeError names the
+    actual type, so callers get a clear error rather than a confusing
+    AttributeError from the next .items() call on a dict or list."""
+    for bad in (None, {"KEY": "VALUE"}, [("KEY", "VALUE")], "KEY=VALUE", 42):
+        with pytest.raises(TypeError, match="params must be a Parameters instance"):
+            Contentline.from_parts("SUMMARY", bad, "hello")
+
+
 def test_split_on_unescaped_comma():
     """Test splitting on unescaped commas."""
     from icalendar.parser import split_on_unescaped_comma

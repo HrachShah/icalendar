@@ -113,9 +113,10 @@ class Contentline(str):
 
     def __new__(cls, value, strict=False, encoding=DEFAULT_ENCODING):
         value = to_unicode(value, encoding=encoding)
-        assert "\n" not in value, (
-            "Content line can not contain unescaped new line characters."
-        )
+        if "\n" in value:
+            raise ValueError(
+                "Content line can not contain unescaped new line characters."
+            )
         self = super().__new__(cls, value)
         self.strict = strict
         return self
@@ -129,7 +130,11 @@ class Contentline(str):
         sorted: bool = True,  # noqa: A002
     ):
         """Turn a parts into a content line."""
-        assert isinstance(params, Parameters)
+        if not isinstance(params, Parameters):
+            raise TypeError(
+                "params must be a Parameters instance, "
+                f"not {type(params).__name__}"
+            )
         if hasattr(values, "to_ical"):
             values = values.to_ical()
         else:
