@@ -260,6 +260,27 @@ class TestProp(unittest.TestCase):
         assert vUri("http://www.example.com/").to_ical() == b"http://www.example.com/"
         assert vUri.from_ical("http://www.example.com/") == "http://www.example.com/"
 
+        # vUri.from_ical surfaces a clear ValueError naming the expected
+        # type and using repr() for the offending value when the input
+        # cannot be decoded into a URI. Previously the message was
+        # "Expected , got: <ical>" (missing the type name) and the value
+        # was unquoted, which made tracebacks hard to read for bytes or
+        # values containing spaces.
+        class _Unstringable:
+            def __str__(self):
+                raise RuntimeError("boom")
+
+        with pytest.raises(ValueError, match=r"^Expected URI, got: "):
+            vUri.from_ical(_Unstringable())
+        # The error message must contain the type repr (which is
+        # the safe fallback from object.__repr__).
+        try:
+            vUri.from_ical(_Unstringable())
+        except ValueError as e:
+            assert "_Unstringable" in str(e) or "object at 0x" in str(e)
+        else:
+            pytest.fail("expected ValueError")
+
     def test_prop_vGeo(self):
         from icalendar.prop import vGeo
 
