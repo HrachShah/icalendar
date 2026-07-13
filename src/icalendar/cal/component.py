@@ -315,7 +315,11 @@ class Component(CaselessDict):
         RFC requires.
 
         Parameters:
-            name: Name of the property.
+            name: Name of the property. Must be a ``str``; an iCalendar
+                property name like ``"summary"`` or ``"DTSTART"``. Non-string
+                names used to fall through to ``self.types_factory`` and
+                surface as an opaque ``AttributeError: 'X' object has no
+                attribute 'upper'`` from the type lookup.
             value:
                 Value of the property. Either a basic Python type or any of
                 icalendar's own property types.
@@ -339,6 +343,10 @@ class Component(CaselessDict):
             vText(b'Team sync')
 
         """
+        if not isinstance(name, str):
+            raise TypeError(
+                f"add() name must be a str, got {type(name).__name__}: {name!r}"
+            )
         if isinstance(value, datetime) and name.lower() in (
             "dtstamp",
             "created",
