@@ -89,6 +89,11 @@ class vInt(int):
     params: Parameters
 
     def __new__(cls, *args, params: dict[str, Any] | None = None, **kwargs):
+        if args and isinstance(args[0], bool):
+            raise TypeError(
+                f"vInt value must be a real int, not bool (got {args[0]!r}); "
+                f"use vBoolean from icalendar.prop for boolean values"
+            )
         self = super().__new__(cls, *args, **kwargs)
         self.params = Parameters(params)
         return self

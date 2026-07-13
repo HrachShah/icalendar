@@ -22,3 +22,10 @@ def test_ical_value():
     """ical_value property returns the int value."""
     assert vInt(1).ical_value == 1
     assert vInt(0).ical_value == 0
+
+
+@pytest.mark.parametrize("bad_value", [True, False])
+def test_vint_constructor_rejects_bool(bad_value):
+    """Bool input to vInt must be rejected with a clear TypeError pointing at vBoolean."""
+    with pytest.raises(TypeError, match="vInt value must be a real int, not bool"):
+        vInt(bad_value)
