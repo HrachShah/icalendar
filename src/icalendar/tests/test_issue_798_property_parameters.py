@@ -103,6 +103,20 @@ def test_delete_delegation_to(p):
     assert p.DELEGATED_TO == ()
 
 
+def test_empty_string_delegation_to_is_deleted(p):
+    p.DELEGATED_TO = "mailto:foo"
+    p.DELEGATED_TO = ""
+    assert p.DELEGATED_TO == ()
+    assert "DELEGATED-TO" not in p.params
+
+
+def test_none_delegation_to_is_deleted(p):
+    p.DELEGATED_TO = "mailto:foo"
+    p.DELEGATED_TO = None
+    assert p.DELEGATED_TO == ()
+    assert "DELEGATED-TO" not in p.params
+
+
 @pytest.mark.parametrize(
     ("value", "expected"),
     [

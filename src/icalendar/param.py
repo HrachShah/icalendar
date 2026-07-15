@@ -191,7 +191,7 @@ Description:
 def quoted_list_parameter(name: str, doc: str) -> property:
     """Return a parameter that contains a quoted list."""
 
-    def fget(self: VPROPERTY) -> tuple[str]:
+    def fget(self: VPROPERTY) -> tuple[str, ...]:
         value = self.params.get(name)
         if value is None:
             return ()
@@ -199,11 +199,11 @@ def quoted_list_parameter(name: str, doc: str) -> property:
             return tuple(value.split(","))
         return value
 
-    def fset(self: VPROPERTY, value: str | tuple[str]):
-        if value == ():
+    def fset(self: VPROPERTY, value: str | Sequence[str] | None):
+        if value is None or value == () or value == "":
             fdel(self)
         else:
-            self.params[name] = (value,) if isinstance(value, str) else value
+            self.params[name] = (value,) if isinstance(value, str) else tuple(value)
 
     def fdel(self: VPROPERTY):
         self.params.pop(name, None)
