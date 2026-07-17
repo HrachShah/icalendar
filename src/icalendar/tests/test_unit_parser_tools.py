@@ -31,3 +31,8 @@ class TestParserTools(unittest.TestCase):
             b"li1": [b"it1", b"it2", {b"k5": b"v5", b"k4": b"v4"}, 123],
         }
         assert data_encode(data1) == res
+
+    def test_parser_tools_data_encode_respects_nested_encoding(self):
+        assert data_encode({"café": "déjà"}, encoding="latin-1") == {
+            "café".encode("latin-1"): "déjà".encode("latin-1")
+        }
