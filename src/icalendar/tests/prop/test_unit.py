@@ -295,6 +295,8 @@ class TestProp(unittest.TestCase):
 
         # And a few failures
         self.assertRaises(ValueError, vUTCOffset.from_ical, "+323k")
+        self.assertRaises(ValueError, vUTCOffset.from_ical, "+0200trailing")
+        self.assertRaises(ValueError, vUTCOffset.from_ical, "+0260")
 
         self.assertRaises(ValueError, vUTCOffset.from_ical, "+2400")
 
