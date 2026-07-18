@@ -181,6 +181,8 @@ class vUTCOffset:
         hours = int(match.group("hours"))
         minutes = int(match.group("minutes"))
         seconds = int(match.group("seconds") or 0)
+        if hours >= 24 or minutes >= 60 or seconds >= 60:
+            raise JCalParsingError(f"Cannot parse {jcal_property!r} as UTC-OFFSET.")
         t = timedelta(hours=hours, minutes=minutes, seconds=seconds)
         if negative:
             t = -t

@@ -464,3 +464,11 @@ def test_frequency():
         match=r'\[3\]\["FREQ"\] in vFrequency: The value must be a valid frequency\.',
     ):
         vRecur.from_jcal(["rrule", {}, "recur", {"FREQ": "INVALID"}])
+
+
+def test_utc_offset_rejects_out_of_range_clock_components():
+    from icalendar.prop import vUTCOffset
+
+    for value in ("+24:00", "+01:60", "+01:00:60"):
+        with pytest.raises(JCalParsingError):
+            vUTCOffset.from_jcal(["tzoffsetfrom", {}, "utc-offset", value])
