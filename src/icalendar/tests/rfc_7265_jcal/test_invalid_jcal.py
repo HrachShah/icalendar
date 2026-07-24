@@ -464,3 +464,11 @@ def test_frequency():
         match=r'\[3\]\["FREQ"\] in vFrequency: The value must be a valid frequency\.',
     ):
         vRecur.from_jcal(["rrule", {}, "recur", {"FREQ": "INVALID"}])
+
+
+def test_utc_offset_rejects_trailing_characters():
+    """A jCal UTC offset must consume the complete value."""
+    from icalendar.prop import vUTCOffset
+
+    with pytest.raises(JCalParsingError):
+        vUTCOffset.from_jcal(["tzoffsetfrom", {}, "utc-offset", "+01:00extra"])

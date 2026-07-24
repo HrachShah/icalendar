@@ -168,7 +168,7 @@ class vUTCOffset:
             ~error.JCalParsingError: If the provided jCal is invalid.
         """
         JCalParsingError.validate_property(jcal_property, cls)
-        match = UTC_OFFSET_JCAL_REGEX.match(jcal_property[3])
+        match = UTC_OFFSET_JCAL_REGEX.fullmatch(jcal_property[3])
         if match is None:
             raise JCalParsingError(f"Cannot parse {jcal_property!r} as UTC-OFFSET.")
         negative = match.group("sign") == "-"
