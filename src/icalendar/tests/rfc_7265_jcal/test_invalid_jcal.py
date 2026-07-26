@@ -453,6 +453,14 @@ def test_skip():
         vSkip.parse_jcal_value("INVALID")
 
 
+def test_utc_offset_rejects_trailing_characters():
+    """A jCal UTC offset must consume the complete value."""
+    from icalendar.prop import vUTCOffset
+
+    with pytest.raises(JCalParsingError):
+        vUTCOffset.from_jcal(["tzoffsetfrom", {}, "utc-offset", "+01:00extra"])
+
+
 def test_frequency():
     """The FREQ parameter must be valid."""
     # parse correct value
