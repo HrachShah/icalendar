@@ -116,13 +116,14 @@ class vUTCOffset:
     def from_ical(cls, ical):
         if isinstance(ical, cls):
             return ical.td
+        if not isinstance(ical, str) or not re.fullmatch(r"[+-]?\d{4}(?:\d{2})?", ical):
+            raise ValueError(f"Expected UTC offset, got: {ical}")
         try:
-            sign, hours, minutes, seconds = (
-                ical[0:1],
-                int(ical[1:3]),
-                int(ical[3:5]),
-                int(ical[5:7] or 0),
-            )
+            sign = ical[0] if ical[0] in "+-" else "+"
+            start = 1 if ical[0] in "+-" else 0
+            hours = int(ical[start:start + 2])
+            minutes = int(ical[start + 2:start + 4])
+            seconds = int(ical[start + 4:start + 6] or 0)
             offset = timedelta(hours=hours, minutes=minutes, seconds=seconds)
         except Exception as e:
             raise ValueError(f"Expected UTC offset, got: {ical}") from e
