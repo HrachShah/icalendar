@@ -187,10 +187,10 @@ def foldline(line: str, limit: int = 75, fold_sep: str = "\r\n ") -> str:
     byte_count = 0
     for char in line:
         char_byte_len = len(char.encode(DEFAULT_ENCODING))
-        byte_count += char_byte_len
-        if byte_count >= limit:
+        if byte_count and byte_count + char_byte_len >= limit:
             ret_chars.append(fold_sep)
-            byte_count = char_byte_len
+            byte_count = 0
+        byte_count += char_byte_len
         ret_chars.append(char)
 
     return "".join(ret_chars)

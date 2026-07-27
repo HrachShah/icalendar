@@ -272,6 +272,7 @@ class IcalendarTestCase(unittest.TestCase):
             foldline("DESCRIPTION:АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЬЫЪЭЮЯ")
             == "DESCRIPTION:АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЬЫЪЭ\r\n ЮЯ"
         )
+        assert foldline("😀" * 20, limit=3).startswith("😀\r\n ")
 
     def test_value_double_quoting(self):
         assert dquote("Max") == "Max"
