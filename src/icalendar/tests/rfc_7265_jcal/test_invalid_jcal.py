@@ -461,6 +461,15 @@ def test_utc_offset_rejects_trailing_characters():
         vUTCOffset.from_jcal(["tzoffsetfrom", {}, "utc-offset", "+01:00extra"])
 
 
+def test_utc_offset_rejects_out_of_range_components():
+    """A jCal UTC offset must use valid time components."""
+    from icalendar.prop import vUTCOffset
+
+    for value in ("+24:00", "+01:60", "+01:00:60"):
+        with pytest.raises(JCalParsingError):
+            vUTCOffset.from_jcal(["tzoffsetfrom", {}, "utc-offset", value])
+
+
 def test_frequency():
     """The FREQ parameter must be valid."""
     # parse correct value
