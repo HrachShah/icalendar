@@ -286,6 +286,10 @@ class IcalendarTestCase(unittest.TestCase):
             '"Rasmussen, Max"',
         ]
 
+    def test_q_split_empty_string(self):
+        assert q_split("") == [""]
+        assert q_split("", "=", maxsplit=1) == [""]
+
     def test_q_split_bin(self):
         for s in ("X-SOMETHING=ABCDE==", ",,,"):
             for maxsplit in range(-1, 3):
