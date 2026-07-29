@@ -44,6 +44,7 @@ class TypesFactory(CaselessDict):
 
     _instance: ClassVar[TypesFactory | None] = None
 
+    @staticmethod
     def instance() -> TypesFactory:
         """Return a singleton instance of this class."""
         if TypesFactory._instance is None:

@@ -354,3 +354,9 @@ class TestProp(unittest.TestCase):
             factory.from_ical("cn", b"Rasmussen\\, Max M\xc3\xb8ller")
             == "Rasmussen\\, Max Møller"
         )
+
+    def test_types_factory_singleton_is_available_from_instances(self):
+        from icalendar.prop import TypesFactory
+
+        factory = TypesFactory()
+        assert factory.instance() is TypesFactory.instance()
