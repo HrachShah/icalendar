@@ -97,7 +97,7 @@ class ComponentFactory(CaselessDict):
 
             component_name = name.upper()
             class_name = re.sub(r"[^\w]+", "", name)
-            if not class_name:
+            if not class_name or not class_name.isidentifier():
                 raise ValueError(f"component name {name!r} has no valid class name")
             component_class = type(class_name, (Component,), {"name": component_name})
             self.add_component_class(component_class)

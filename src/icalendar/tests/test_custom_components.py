@@ -12,6 +12,8 @@ According to RFC 5545:
 icalendar preserves all custom components through dynamic component creation.
 """
 
+import pytest
+
 from icalendar import Calendar, Component, Event
 from icalendar.cal.component_factory import ComponentFactory
 
@@ -57,6 +59,12 @@ class TestComponentFactory:
         # Hyphens removed from class name, but preserved in .name
         assert component_class.__name__ == "XMYCOMPONENT"
         assert component_class.name == "X-MY-COMPONENT"
+
+    def test_rejects_names_that_cannot_form_class_identifiers(self):
+        """Factory rejects names that produce invalid Python class names."""
+        factory = ComponentFactory()
+        with pytest.raises(ValueError, match="no valid class name"):
+            factory.get_component_class("123-COMPONENT")
 
 
 class TestCustomComponentWithComponentFromIcal:
