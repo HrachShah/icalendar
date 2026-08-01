@@ -39,6 +39,17 @@ class TestComponentFactory:
         class2 = factory.get_component_class("X-VENDOR")
         assert class1 is class2
 
+    def test_rejects_empty_component_names(self):
+        """Factory requires a component name."""
+        factory = ComponentFactory()
+        for name in ("", None, 42):
+            try:
+                factory.get_component_class(name)
+            except ValueError:
+                pass
+            else:
+                raise AssertionError(f"expected ValueError for {name!r}")
+
     def test_sanitizes_component_names(self):
         """Factory sanitizes non-alphanumeric characters in names."""
         factory = ComponentFactory()

@@ -91,6 +91,9 @@ class ComponentFactory(CaselessDict):
         if not isinstance(name, str) or not name:
             raise ValueError("component name must be a non-empty string")
 
+        if not isinstance(name, str) or not name:
+            raise ValueError("Component name must be a non-empty string")
+
         component_class = self.get(name)
         if component_class is None:
             from icalendar.cal.component import Component
