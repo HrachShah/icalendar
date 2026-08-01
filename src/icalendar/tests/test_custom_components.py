@@ -311,3 +311,13 @@ END:X-OUTER
         reparsed = Component.from_ical(regenerated)
         assert len(reparsed.subcomponents) == 1
         assert reparsed.subcomponents[0].name == "X-INNER"
+
+    def test_rejects_component_names_without_a_class_name(self):
+        """Factory rejects names that cannot produce a usable class."""
+        factory = ComponentFactory()
+        try:
+            factory.get_component_class("---")
+        except ValueError as exc:
+            assert "no valid class name" in str(exc)
+        else:
+            raise AssertionError("expected invalid component name to be rejected")
