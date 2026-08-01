@@ -46,6 +46,15 @@ class TestComponentRegister:
         with pytest.raises(ValueError, match="must have a 'name' attribute"):
             Component.register(BadComponent)
 
+    @pytest.mark.parametrize('name', ('', 42))
+    def test_register_component_with_invalid_name_type_raises(self, name):
+        class BadComponent(Component):
+            pass
+
+        BadComponent.name = name
+        with pytest.raises(ValueError, match="non-empty string"):
+            Component.register(BadComponent)
+
     def test_register_duplicate_component_raises(self):
         """Registering same component name twice raises ValueError."""
 

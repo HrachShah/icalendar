@@ -140,6 +140,10 @@ class Component(CaselessDict):
         """
         if not hasattr(component_class, "name") or component_class.name is None:
             raise ValueError(f"{component_class} must have a 'name' attribute")
+        if not isinstance(component_class.name, str) or not component_class.name:
+            raise ValueError(
+                f"{component_class} must have a non-empty string 'name' attribute"
+            )
 
         # Check if already registered
         component_factory = cls._get_component_factory()
