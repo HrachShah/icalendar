@@ -39,7 +39,8 @@ class TestComponentFactory:
         factory = ComponentFactory()
         class1 = factory.get_component_class("X-VENDOR")
         class2 = factory.get_component_class("X-VENDOR")
-        assert class1 is class2
+        class3 = factory.get_component_class("x-vendor")
+        assert class1 is class2 is class3
 
     def test_rejects_empty_component_names(self):
         """Factory requires a component name."""
