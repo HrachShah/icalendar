@@ -764,11 +764,8 @@ class Component(CaselessDict):
         component.concepts = concepts
         component.refids = refids
         if subcomponents is not None:
-            component.subcomponents = (
-                subcomponents
-                if isinstance(subcomponents, list)
-                else list(subcomponents)
-            )
+            for subcomponent in subcomponents:
+                component.add_component(subcomponent)
         return component
 
     def to_jcal(self) -> list:

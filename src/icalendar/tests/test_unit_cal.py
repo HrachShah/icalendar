@@ -477,6 +477,11 @@ def test_comparing_calendars(calendars, calendar, other_calendar, tzp):
     assert are_calendars_equal == are_calendars_actually_equal
 
 
+def test_new_rejects_non_component_subcomponents():
+    with pytest.raises(TypeError, match="add_component requires a Component instance"):
+        Component.new(subcomponents=["not a component"])
+
+
 @pytest.mark.parametrize(
     ("calendar", "shuffeled_calendar"),
     [
