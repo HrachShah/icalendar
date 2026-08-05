@@ -49,6 +49,15 @@ def int_expected(request):
     return request.param
 
 
+def test_boolean_is_not_an_integer():
+    """JSON booleans must not satisfy an integer value type."""
+    with pytest.raises(
+        JCalParsingError,
+        match=r"in vInt: The value must be an integer.",
+    ):
+        vRecur.from_jcal(["rrule", {}, "recur", {"COUNT": True}])
+
+
 @pytest.fixture(params=["a", [], {}, None, 1])
 def float_expected(request):
     """Return everything else"""

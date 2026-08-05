@@ -184,7 +184,9 @@ class JCalParsingError(ValueError):
         path: list[str | int] | None | str | int = None,
     ):
         """Validate the type of a jCal value."""
-        if not isinstance(jcal, expected_type):
+        if not isinstance(jcal, expected_type) or (
+            expected_type is int and isinstance(jcal, bool)
+        ):
             type_name = (
                 cls._type_names[expected_type]
                 if isinstance(expected_type, type)
