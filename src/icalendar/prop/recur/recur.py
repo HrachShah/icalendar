@@ -205,6 +205,8 @@ class vRecur(CaselessDict):
                     # E.g. incorrect trailing semicolon, like (issue #157):
                     # FREQ=YEARLY;BYMONTH=11;BYDAY=1SU;
                     continue
+                if key in recur:
+                    raise ValueError(f"Duplicate recurrence rule part: {key}")
                 recur[key] = cls.parse_type(key, vals)
             return cls(recur)
         except ValueError:

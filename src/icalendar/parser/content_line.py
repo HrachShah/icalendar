@@ -254,10 +254,10 @@ class Contentlines(list[Contentline]):
         st = to_unicode(st)
         try:
             # a fold is carriage return followed by either a space or a tab
-            unfolded = UFOLD.sub("", st)
-            lines = cls(Contentline(line) for line in NEWLINE.split(unfolded) if line)
+            folded = UFOLD.sub("", st)
+            lines = cls(Contentline(line) for line in NEWLINE.split(folded) if line)
             lines.append("")  # '\r\n' at the end of every content line
-        except Exception as e:
+        except (ValueError, TypeError, KeyError) as e:
             raise ValueError("Expected StringType with content lines") from e
         return lines
 

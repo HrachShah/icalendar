@@ -3,10 +3,16 @@ from datetime import date, datetime
 import pytest
 
 from icalendar.cal.event import Event
+from icalendar.prop.recur import vRecur
 
 
 def test_recurrence_properly_parsed(events):
     assert events.event_with_recurrence["rrule"] == {"COUNT": [100], "FREQ": ["DAILY"]}
+
+
+def test_duplicate_recurrence_rule_parts_are_rejected():
+    with pytest.raises(ValueError, match="Duplicate recurrence rule part: COUNT"):
+        vRecur.from_ical("FREQ=DAILY;COUNT=1;COUNT=2")
 
 
 @pytest.mark.parametrize(

@@ -272,6 +272,7 @@ class IcalendarTestCase(unittest.TestCase):
             foldline("DESCRIPTION:АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЬЫЪЭЮЯ")
             == "DESCRIPTION:АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЬЫЪЭ\r\n ЮЯ"
         )
+        assert foldline("😀" * 20, limit=3).startswith("😀\r\n ")
 
     def test_value_double_quoting(self):
         assert dquote("Max") == "Max"
@@ -284,6 +285,10 @@ class IcalendarTestCase(unittest.TestCase):
             "Moller",
             '"Rasmussen, Max"',
         ]
+
+    def test_q_split_empty_string(self):
+        assert q_split("") == [""]
+        assert q_split("", "=", maxsplit=1) == [""]
 
     def test_q_split_bin(self):
         for s in ("X-SOMETHING=ABCDE==", ",,,"):

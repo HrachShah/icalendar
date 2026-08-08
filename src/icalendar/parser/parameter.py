@@ -147,6 +147,8 @@ def q_split(st: str, sep: str = ",", maxsplit: int = -1) -> list[str]:
     result = []
     cursor = 0
     length = len(st)
+    if not st:
+        return [st]
     inquote = 0
     splits = 0
     for i, ch in enumerate(st):

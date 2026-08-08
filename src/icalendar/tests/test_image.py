@@ -6,7 +6,7 @@ import base64
 
 import pytest
 
-from icalendar import Calendar, Image, vBinary, vUri
+from icalendar import Calendar, Image, vBinary, vUri, vUnknown
 from icalendar.prop import vText
 
 TRANSPARENT_PIXEL = base64.b64decode("""iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCA
@@ -100,6 +100,16 @@ def test_no_images():
     """Test that an empty calendar has no images."""
     calendar = Calendar()
     assert len(calendar.images) == 0
+
+
+def test_image_value_parameter_selects_property_type():
+    """An explicit IMAGE VALUE parameter selects URI or BINARY decoding."""
+    from icalendar.prop.factory import TypesFactory
+
+    factory = TypesFactory.instance()
+    assert factory.for_property("IMAGE", "URI") is vUri
+    assert factory.for_property("IMAGE", "BINARY") is vBinary
+    assert factory.for_property("IMAGE") is vUnknown
 
 
 def test_create_image_invalid_type():

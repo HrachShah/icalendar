@@ -50,3 +50,10 @@ def test_delete_value_None(p):
     p.value = None
     assert p.value is None
     assert "VALUE" not in p
+
+
+def test_binary_value_parameter_enum():
+    """BINARY is a valid RFC 5545 value type."""
+    p = Parameters(value="BINARY")
+    assert p.value == VALUE.BINARY
+
