@@ -260,6 +260,8 @@ class IcalendarTestCase(unittest.TestCase):
             foldline("привет".encode(), limit=3)
 
         assert foldline("foobar", limit=4) == "foo\r\n bar"
+        with pytest.raises(ValueError, match="limit must be at least 2"):
+            foldline("foobar", limit=1)
         assert (
             foldline(
                 "Lorem ipsum dolor sit amet, consectetur adipiscing elit"

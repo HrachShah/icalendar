@@ -172,6 +172,8 @@ def foldline(line: str, limit: int = 75, fold_sep: str = "\r\n ") -> str:
     """
     assert isinstance(line, str)
     assert "\n" not in line
+    if limit < 2:
+        raise ValueError("limit must be at least 2")
 
     # Use a fast and simple variant for the common case that line is all ASCII.
     try:
